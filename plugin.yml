@@ -1,0 +1,6 @@
+name: PlotHider
+main: com.boydti.phider.Main
+version: 3.3.1
+description: Hide plots from other players
+authors: [Empire92]
+depend: [PlotSquared,ProtocolLib]
