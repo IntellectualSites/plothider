@@ -1,14 +1,11 @@
 package com.boydti.phider;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.bukkit.entity.Player;
 
 import com.comphenix.protocol.PacketType;
@@ -30,7 +27,6 @@ import com.intellectualcrafters.plot.object.PlotArea;
 import com.intellectualcrafters.plot.object.PlotBlock;
 import com.intellectualcrafters.plot.object.PlotPlayer;
 import com.intellectualcrafters.plot.util.Permissions;
-import com.intellectualcrafters.plot.util.StringMan;
 import com.plotsquared.bukkit.util.BukkitUtil;
 
 public class PacketHandler {
@@ -217,12 +213,6 @@ public class PacketHandler {
                     }
 
                 } catch (Throwable e) {
-                    try {
-                        FileUtils.write(new File("test.txt"), StringMan.getString(sections));
-                    } catch (IOException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
                     e.printStackTrace();
                 }
 
