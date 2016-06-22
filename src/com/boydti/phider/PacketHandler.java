@@ -20,7 +20,6 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.comphenix.protocol.wrappers.MultiBlockChangeInfo;
 import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.flag.FlagManager;
 import com.intellectualcrafters.plot.object.Location;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotArea;
@@ -48,11 +47,10 @@ public class PacketHandler {
                 }
                 PacketContainer packet = event.getPacket();
                 StructureModifier<BlockPosition> positions = packet.getBlockPositionModifier();
-                System.out.println("1SIZE: " + positions.size());
                 BlockPosition position = positions.read(0);
                 Location loc = new Location(world, position.getX(), 0, position.getZ());
                 Plot plot = loc.getOwnedPlot();
-                if (plot != null && (plot.isDenied(pp.getUUID()) || (!plot.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot, "hide")))) {
+                if (plot != null && (plot.isDenied(pp.getUUID()) || (!plot.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot)))) {
                     event.setCancelled(true);
                 }
             }
@@ -85,10 +83,10 @@ public class PacketHandler {
                 Plot plot2 = corner2.getOwnedPlot();
                 Plot plot3 = corner3.getOwnedPlot();
                 Plot plot4 = corner4.getOwnedPlot();
-                plot1 = (plot1 != null && (plot1.isDenied(pp.getUUID()) || (!plot1.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot1, "hide")))) ? plot1 : null;
-                plot2 = (plot2 != null && (plot2.isDenied(pp.getUUID()) || (!plot2.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot2, "hide")))) ? plot2 : null;
-                plot3 = (plot3 != null && (plot3.isDenied(pp.getUUID()) || (!plot3.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot3, "hide")))) ? plot3 : null;
-                plot4 = (plot4 != null && (plot4.isDenied(pp.getUUID()) || (!plot4.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot4, "hide")))) ? plot4 : null;
+                plot1 = (plot1 != null && (plot1.isDenied(pp.getUUID()) || (!plot1.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot1)))) ? plot1 : null;
+                plot2 = (plot2 != null && (plot2.isDenied(pp.getUUID()) || (!plot2.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot2)))) ? plot2 : null;
+                plot3 = (plot3 != null && (plot3.isDenied(pp.getUUID()) || (!plot3.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot3)))) ? plot3 : null;
+                plot4 = (plot4 != null && (plot4.isDenied(pp.getUUID()) || (!plot4.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot4)))) ? plot4 : null;
                 if (plot1 == null && plot2 == null && plot3 == null && plot4 == null) { // No plots to hide
                     return;
                 }
@@ -99,7 +97,6 @@ public class PacketHandler {
                 }
                 // Hide some of the blocks (but maybe not all)
                 List<MultiBlockChangeInfo> changes = new ArrayList<>(Arrays.asList(changeArray.read(0)));
-                System.out.println("CHANGES: " + changes.size() + " | " + chunkArray.size() + " | " + changeArray.size());
                 Iterator<MultiBlockChangeInfo> iter = changes.iterator();
                 Plot denied = plot1 != null ? plot1 : plot2 != null ? plot2 : plot3 != null ? plot3 : plot4;
                 PlotArea area = denied.getArea();
@@ -151,10 +148,10 @@ public class PacketHandler {
                 Plot plot2 = corner2.getOwnedPlot();
                 Plot plot3 = corner3.getOwnedPlot();
                 Plot plot4 = corner4.getOwnedPlot();
-                plot1 = (plot1 != null && (plot1.isDenied(pp.getUUID()) || (!plot1.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot1, "hide")))) ? plot1 : null;
-                plot2 = (plot2 != null && (plot2.isDenied(pp.getUUID()) || (!plot2.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot2, "hide")))) ? plot2 : null;
-                plot3 = (plot3 != null && (plot3.isDenied(pp.getUUID()) || (!plot3.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot3, "hide")))) ? plot3 : null;
-                plot4 = (plot4 != null && (plot4.isDenied(pp.getUUID()) || (!plot4.isAdded(pp.getUUID()) && FlagManager.isPlotFlagTrue(plot4, "hide")))) ? plot4 : null;
+                plot1 = (plot1 != null && (plot1.isDenied(pp.getUUID()) || (!plot1.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot1)))) ? plot1 : null;
+                plot2 = (plot2 != null && (plot2.isDenied(pp.getUUID()) || (!plot2.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot2)))) ? plot2 : null;
+                plot3 = (plot3 != null && (plot3.isDenied(pp.getUUID()) || (!plot3.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot3)))) ? plot3 : null;
+                plot4 = (plot4 != null && (plot4.isDenied(pp.getUUID()) || (!plot4.isAdded(pp.getUUID()) && Main.HIDE_FLAG.isTrue(plot4)))) ? plot4 : null;
                 if (plot1 == null && plot2 == null && plot3 == null && plot4 == null) { // No plots to hide
                     return;
                 }
