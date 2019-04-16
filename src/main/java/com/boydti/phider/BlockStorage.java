@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import org.apache.commons.lang.mutable.MutableInt;
 
 public class BlockStorage {
@@ -21,7 +20,7 @@ public class BlockStorage {
     private final byte[] light;
     private final int size;
 
-    public BlockStorage(byte[] in, boolean sky) throws IOException {
+    public BlockStorage(byte[] in, boolean sky) {
         MutableInt mut = new MutableInt();
         this.bitsPerEntry = readUnsigned(in, mut);
 
@@ -170,7 +169,7 @@ public class BlockStorage {
         return value | ((b & 0x7F) << (size * 7));
     }
 
-    public long[] readLongs(byte[] bytes, MutableInt mut, int length) throws IOException {
+    public long[] readLongs(byte[] bytes, MutableInt mut, int length) {
         if (length < 0) {
             throw new IllegalArgumentException("Array cannot have length less than 0.");
         }
@@ -183,7 +182,7 @@ public class BlockStorage {
         return l;
     }
 
-    public void writeVarInt(ByteArrayOutputStream out, int i) throws IOException {
+    public void writeVarInt(ByteArrayOutputStream out, int i) {
         while ((i & ~0x7F) != 0) {
             out.write((i & 0x7F) | 0x80);
             i >>>= 7;
@@ -192,13 +191,13 @@ public class BlockStorage {
         out.write(i);
     }
 
-    public void writeLongs(ByteArrayOutputStream out, long[] l) throws IOException {
+    public void writeLongs(ByteArrayOutputStream out, long[] l) {
         for (int index = 0; index < l.length; index++) {
             writeLong(out, l[index]);
         }
     }
 
-    public void writeLong(ByteArrayOutputStream out, long l) throws IOException {
+    public void writeLong(ByteArrayOutputStream out, long l) {
         out.write((byte) (l >>> 56));
         out.write((byte) (l >>> 48));
         out.write((byte) (l >>> 40));
