@@ -46,7 +46,7 @@ public class FlexibleStorage {
         return this.size;
     }
 
-    byte get(int index) {
+    int get(int index) {
         if ((index < 0) || (index > this.size - 1)) {
             throw new IndexOutOfBoundsException();
         }
@@ -55,10 +55,10 @@ public class FlexibleStorage {
         int endIndex = ((index + 1) * this.bitsPerEntry - 1) / 64;
         int startBitSubIndex = bitIndex % 64;
         if (startIndex == endIndex) {
-            return (byte) (this.data[startIndex] >>> startBitSubIndex & this.maxEntryValue);
+            return (int) (this.data[startIndex] >>> startBitSubIndex & this.maxEntryValue);
         }
         int endBitSubIndex = 64 - startBitSubIndex;
-        return (byte) (
+        return (int) (
             (this.data[startIndex] >>> startBitSubIndex | this.data[endIndex] << endBitSubIndex)
                 & this.maxEntryValue);
     }
@@ -75,11 +75,11 @@ public class FlexibleStorage {
         int endIndex = ((index + 1) * this.bitsPerEntry - 1) / 64;
         int startBitSubIndex = bitIndex % 64;
         this.data[startIndex] =
-            (byte) (this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex)
+            (this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex)
                 | (value & this.maxEntryValue) << startBitSubIndex);
         if (startIndex != endIndex) {
             int endBitSubIndex = 64 - startBitSubIndex;
-            this.data[endIndex] = (byte) (this.data[endIndex] >>> endBitSubIndex << endBitSubIndex
+            this.data[endIndex] = (this.data[endIndex] >>> endBitSubIndex << endBitSubIndex
                 | (value & this.maxEntryValue) >> endBitSubIndex);
         }
     }
