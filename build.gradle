@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven { url "https://jitpack.io" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
+    maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+    maven { url "http://repo.dmulloy2.net/nexus/repository/public/" }
+    maven { url "https://ci.athion.net/job/PlotSquared-Releases/ws/mvn/"}
+    maven { url "https://maven.enginehub.org/repo/" }
+    maven { url "https://repo.maven.apache.org/maven2" }
+    maven {
+        name = "papermc"
+        url = "https://papermc.io/repo/repository/maven-public/"
+    }
+    mavenLocal()
+}
+
+dependencies {
+    "implementation"("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
+    "implementation"("com.github.intellectualsites.plotsquared:PlotSquared-API:4.453")
+    "implementation"("com.github.intellectualsites.plotsquared:PlotSquared-BukkitAPI:4.453")
+    "implementation"("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
+    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.0")
+}
+
+processResources {
+    from('src/main/resources') {
+        include 'plugin.yml'
+    }
+}
+
+clean.doFirst {
+    delete "../target"
+}
+
+jar.destinationDirectory = file('./target')
