@@ -1,24 +1,18 @@
-package com.boydti.phider;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+package com.boydti.plothider;
 
 import org.apache.commons.lang.mutable.MutableInt;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+
 public class BlockStorage {
     private static final Integer AIR = 0x00;
-
-    private int bitsPerEntry;
-
     private final List<Integer> states;
-    private FlexibleStorage storage;
     private final byte[] light;
     private final int size;
+    private int bitsPerEntry;
+    private FlexibleStorage storage;
 
     public BlockStorage(byte[] in, boolean sky) {
         MutableInt mut = new MutableInt();
@@ -36,6 +30,10 @@ public class BlockStorage {
         this.storage = new FlexibleStorage(this.bitsPerEntry, readLongs(in, mut, expected));
         this.light = Arrays.copyOfRange(in, mut.intValue(), in.length);
         this.size = mut.intValue();
+    }
+
+    private static int index(int x, int y, int z) {
+        return y << 8 | z << 4 | (x);
     }
 
     public byte[] getLight() {
@@ -117,10 +115,6 @@ public class BlockStorage {
         return true;
     }
 
-    private static int index(int x, int y, int z) {
-        return y << 8 | z << 4 | (x);
-    }
-
     @Override
     public boolean equals(Object o) {
         return o instanceof BlockStorage && this.bitsPerEntry == ((BlockStorage) o).bitsPerEntry && this.states.equals(((BlockStorage) o).states) && this.storage.equals(((BlockStorage) o).storage);
@@ -174,7 +168,7 @@ public class BlockStorage {
             throw new IllegalArgumentException("Array cannot have length less than 0.");
         }
 
-        long l[] = new long[length];
+        long[] l = new long[length];
         for (int index = 0; index < length; index++) {
             l[index] = readLong(bytes, mut);
         }

@@ -1,4 +1,4 @@
-package com.boydti.phider;
+package com.boydti.plothider;
 
 import com.github.intellectualsites.plotsquared.bukkit.util.BukkitUtil;
 import com.github.intellectualsites.plotsquared.plot.flag.BooleanFlag;
@@ -17,14 +17,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin implements Listener {
 
     public static BooleanFlag HIDE_FLAG = new BooleanFlag("hide");
+    private static final int BSTATS_ID = 6412;
 
     public void onEnable() {
         new PacketHandler(this);
         Bukkit.getPluginManager().registerEvents(this, this);
         Flags.registerFlag(HIDE_FLAG);
+        new Metrics(this, BSTATS_ID);
     }
 
-    @EventHandler public void onTeleport(PlayerTeleportEvent event) {
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
         PlotPlayer pp = BukkitUtil.getPlayer(player);
         if (Permissions.hasPermission(pp, "plots.plothider.bypass")) {
@@ -32,7 +35,7 @@ public class Main extends JavaPlugin implements Listener {
         }
         Plot plot = pp.getCurrentPlot();
         if ((plot != null) && ((plot.isDenied(pp.getUUID())) || ((!plot.isAdded(pp.getUUID()))
-            && (HIDE_FLAG.isTrue(plot))))) {
+                && (HIDE_FLAG.isTrue(plot))))) {
             Location to = event.getTo();
             Location from = event.getFrom();
             if ((to.getWorld().equals(from.getWorld())) && (to.distanceSquared(from) < 8.0D)) {
