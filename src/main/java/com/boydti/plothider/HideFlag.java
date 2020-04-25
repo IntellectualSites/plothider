@@ -2,7 +2,6 @@ package com.boydti.plothider;
 
 import com.plotsquared.core.configuration.StaticCaption;
 import com.plotsquared.core.plot.flag.types.BooleanFlag;
-import com.sun.istack.internal.NotNull;
 
 public class HideFlag extends BooleanFlag<HideFlag> {
 
@@ -13,7 +12,8 @@ public class HideFlag extends BooleanFlag<HideFlag> {
         super(value, new StaticCaption("hide", false));
     }
 
-    @Override protected HideFlag flagOf(@NotNull Boolean value) {
+    @Override
+    protected HideFlag flagOf(Boolean value) {
         return value ? HIDE_FLAG_TRUE : HIDE_FLAG_FALSE;
     }
 
