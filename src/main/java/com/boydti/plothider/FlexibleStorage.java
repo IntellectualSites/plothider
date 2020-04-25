@@ -15,7 +15,7 @@ public class FlexibleStorage {
     FlexibleStorage(int bitsPerEntry, long[] data) {
         if ((bitsPerEntry < 1) || (bitsPerEntry > 32)) {
             throw new IllegalArgumentException(
-                    "BitsPerEntry cannot be outside of accepted range. " + bitsPerEntry);
+                "BitsPerEntry cannot be outside of accepted range. " + bitsPerEntry);
         }
         this.bitsPerEntry = bitsPerEntry;
         this.data = data;
@@ -59,8 +59,8 @@ public class FlexibleStorage {
         }
         int endBitSubIndex = 64 - startBitSubIndex;
         return (int) (
-                (this.data[startIndex] >>> startBitSubIndex | this.data[endIndex] << endBitSubIndex)
-                        & this.maxEntryValue);
+            (this.data[startIndex] >>> startBitSubIndex | this.data[endIndex] << endBitSubIndex)
+                & this.maxEntryValue);
     }
 
     void set(int index, int value) {
@@ -74,21 +74,20 @@ public class FlexibleStorage {
         int startIndex = bitIndex / 64;
         int endIndex = ((index + 1) * this.bitsPerEntry - 1) / 64;
         int startBitSubIndex = bitIndex % 64;
-        this.data[startIndex] =
-                (this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex)
-                        | (value & this.maxEntryValue) << startBitSubIndex);
+        this.data[startIndex] = (this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex)
+            | (value & this.maxEntryValue) << startBitSubIndex);
         if (startIndex != endIndex) {
             int endBitSubIndex = 64 - startBitSubIndex;
             this.data[endIndex] = (this.data[endIndex] >>> endBitSubIndex << endBitSubIndex
-                    | (value & this.maxEntryValue) >> endBitSubIndex);
+                | (value & this.maxEntryValue) >> endBitSubIndex);
         }
     }
 
     public boolean equals(Object o) {
         return (this == o) || (((o instanceof FlexibleStorage)) && (Arrays
-                .equals(this.data, ((FlexibleStorage) o).data)) && (this.bitsPerEntry
-                == ((FlexibleStorage) o).bitsPerEntry) && (this.size == ((FlexibleStorage) o).size) && (
-                this.maxEntryValue == ((FlexibleStorage) o).maxEntryValue));
+            .equals(this.data, ((FlexibleStorage) o).data)) && (this.bitsPerEntry
+            == ((FlexibleStorage) o).bitsPerEntry) && (this.size == ((FlexibleStorage) o).size) && (
+            this.maxEntryValue == ((FlexibleStorage) o).maxEntryValue));
     }
 
     public int hashCode() {

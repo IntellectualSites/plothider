@@ -4,7 +4,11 @@ import org.apache.commons.lang.mutable.MutableInt;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class BlockStorage {
     private static final Integer AIR = 0x00;
@@ -76,7 +80,9 @@ public class BlockStorage {
 
     public int get(int x, int y, int z) {
         int id = this.storage.get(index(x, y, z));
-        return this.bitsPerEntry <= 8 ? (id >= 0 && id < this.states.size() ? this.states.get(id) : AIR) : id;
+        return this.bitsPerEntry <= 8 ?
+            (id >= 0 && id < this.states.size() ? this.states.get(id) : AIR) :
+            id;
     }
 
     public void set(int x, int y, int z, int state) {
@@ -96,7 +102,8 @@ public class BlockStorage {
                 FlexibleStorage oldStorage = this.storage;
                 this.storage = new FlexibleStorage(this.bitsPerEntry, this.storage.getSize());
                 for (int index = 0; index < this.storage.getSize(); index++) {
-                    this.storage.set(index, this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(index));
+                    this.storage.set(index,
+                        this.bitsPerEntry <= 8 ? oldStorage.get(index) : oldStates.get(index));
                 }
             }
 
@@ -117,7 +124,9 @@ public class BlockStorage {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof BlockStorage && this.bitsPerEntry == ((BlockStorage) o).bitsPerEntry && this.states.equals(((BlockStorage) o).states) && this.storage.equals(((BlockStorage) o).storage);
+        return o instanceof BlockStorage && this.bitsPerEntry == ((BlockStorage) o).bitsPerEntry
+            && this.states.equals(((BlockStorage) o).states) && this.storage
+            .equals(((BlockStorage) o).storage);
     }
 
     @Override
