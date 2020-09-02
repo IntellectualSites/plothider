@@ -25,7 +25,7 @@ dependencies {
     "implementation"("com.plotsquared:PlotSquared:5.10.2")
     "implementation"("com.plotsquared:PlotSquared-Bukkit:5.10.2") { transitive = false }
     "implementation"("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
-    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.0")
+    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.1")
 }
 
 processResources {
