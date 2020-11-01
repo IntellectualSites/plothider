@@ -23,7 +23,7 @@ repositories {
 dependencies {
     "implementation"("org.spigotmc:spigot-api:1.16.3-R0.1-SNAPSHOT")
     "implementation"("com.plotsquared:PlotSquared-Core:5.13.3")
-    "implementation"("com.plotsquared:PlotSquared-Bukkit:5.13.1") { transitive = false }
+    "implementation"("com.plotsquared:PlotSquared-Bukkit:5.13.3") { transitive = false }
     "implementation"("com.destroystokyo.paper:paper-api:1.16.3-R0.1-SNAPSHOT")
     "implementation"("com.comphenix.protocol:ProtocolLib:4.5.1")
 }
