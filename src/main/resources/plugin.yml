@@ -1,8 +1,0 @@
-name: PlotHider
-main: com.boydti.plothider.Main
-version: 4.0.0
-api-version: "1.13"
-description: Hide plots from other players
-authors: [Empire92, dordsor21]
-website: "https://intellectualsites.github.io/download/"
-depend: [PlotSquared,ProtocolLib]
