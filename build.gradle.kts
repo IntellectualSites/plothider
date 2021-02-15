@@ -31,7 +31,7 @@ dependencies {
     compileOnlyApi("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
     compileOnly("com.plotsquared:PlotSquared-Core:5.13.3")
     compileOnly("com.plotsquared:PlotSquared-Bukkit:5.13.3") { isTransitive = false }
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.5.1")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
 }
 
 bukkit {
