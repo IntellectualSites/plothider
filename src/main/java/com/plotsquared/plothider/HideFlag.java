@@ -1,4 +1,4 @@
-package com.boydti.plothider;
+package com.plotsquared.plothider;
 
 import com.plotsquared.core.configuration.StaticCaption;
 import com.plotsquared.core.plot.flag.types.BooleanFlag;
