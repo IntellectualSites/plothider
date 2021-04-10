@@ -19,8 +19,7 @@ repositories {
     mavenCentral()
     maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
     maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
-    maven { url = uri("http://repo.dmulloy2.net/nexus/repository/public/") }
-    mavenLocal()
+    maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
 }
 
 dependencies {
