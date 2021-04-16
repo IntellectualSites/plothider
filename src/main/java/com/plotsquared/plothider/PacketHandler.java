@@ -71,8 +71,9 @@ public class PacketHandler {
                     return;
                 }
                 PacketContainer packet = event.getPacket();
-                StructureModifier<ChunkCoordIntPair> chunkArray = packet.getChunkCoordIntPairs();
-                ChunkCoordIntPair chunk = chunkArray.read(0);
+                StructureModifier<BlockPosition> sectionPositions = packet.getSectionPositions();
+                BlockPosition sectionPosition = sectionPositions.read(0);
+                ChunkCoordIntPair chunk = new ChunkCoordIntPair(sectionPosition.getX(), sectionPosition.getZ());
                 int cx = chunk.getChunkX();
                 int cz = chunk.getChunkZ();
                 int bx = cx << 4;
