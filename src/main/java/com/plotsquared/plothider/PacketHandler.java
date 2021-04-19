@@ -10,8 +10,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
-import com.comphenix.protocol.wrappers.MultiBlockChangeInfo;
+import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.comphenix.protocol.wrappers.nbt.NbtBase;
+import com.google.common.primitives.Shorts;
 import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.location.Location;
@@ -102,38 +103,47 @@ public class PacketHandler {
                         && plot4 == null) { // No plots to hide
                     return;
                 }
-                StructureModifier<MultiBlockChangeInfo[]> changeArray =
-                        packet.getMultiBlockChangeInfoArrays();
                 if (plot1 == plot4 && plot1 != null) { // Not allowed to see the entire chunk
                     event.setCancelled(true);
                     return;
                 }
+                StructureModifier<short[]> positionsArray =
+                        packet.getShortArrays();
+                StructureModifier<WrappedBlockData[]> blocksArray =
+                        packet.getBlockDataArrays();
                 // Hide some of the blocks (but maybe not all)
-                List<MultiBlockChangeInfo> changes =
-                        new ArrayList(Arrays.asList((Object[]) changeArray.read(0)));
-                Iterator<MultiBlockChangeInfo> iter = changes.iterator();
+                List<Short> positions =
+                        new ArrayList<>(Shorts.asList(positionsArray.read(0)));
+                List<WrappedBlockData> blocks =
+                        new ArrayList<>(Arrays.asList(blocksArray.read(0)));
+                // Both lists have same length.
+                Iterator<Short> positionsIter = positions.iterator();
+                Iterator<WrappedBlockData> blocksIter = blocks.iterator();
                 Plot denied =
                         plot1 != null ? plot1 : plot2 != null ? plot2 : plot3 != null ? plot3 : plot4;
                 PlotArea area = denied.getArea();
-                while (iter.hasNext()) {
-                    MultiBlockChangeInfo change = iter.next();
-                    int x = change.getAbsoluteX();
-                    int z = change.getAbsoluteZ();
+                while (positionsIter.hasNext()) {
+                    short change = positionsIter.next();
+                    blocksIter.next();
+                    // Binary operators give section-relative coordinates.
+                    int x = bx + (change >>> 8 & 15);
+                    int z = bz + (change >>> 4 & 15);
                     Plot current = area.getOwnedPlot(new Location(world, x, 0, z));
                     if (current == null) {
                         continue;
                     }
                     if (current == plot1 || current == plot2 || current == plot3
                             || current == plot4) {
-                        iter.remove();
+                        positionsIter.remove();
+                        blocksIter.remove();
                     }
                 }
-                if (changes.size() == 0) {
+                if (positions.size() == 0) {
                     event.setCancelled(true);
                     return;
                 }
-                //                changeArray.write(0, changes.toArray(new MultiBlockChangeInfo[changes.size()]));
-                changeArray.write(0, changes.toArray(new MultiBlockChangeInfo[0]));
+                positionsArray.write(0, Shorts.toArray(positions));
+                blocksArray.write(0, blocks.toArray(new WrappedBlockData[0]));
                 event.setPacket(packet);
             }
         });
