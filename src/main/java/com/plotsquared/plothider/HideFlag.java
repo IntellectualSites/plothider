@@ -1,6 +1,6 @@
 package com.plotsquared.plothider;
 
-import com.plotsquared.core.configuration.caption.StaticCaption;
+import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.plot.flag.types.BooleanFlag;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +10,7 @@ public class HideFlag extends BooleanFlag<HideFlag> {
     public static final HideFlag HIDE_FLAG_FALSE = new HideFlag(false);
 
     private HideFlag(boolean value) {
-        super(value, StaticCaption.of("hide"));
+        super(value, TranslatableCaption.of(PlotHiderPlugin.PLOT_HIDER_NAMESPACE, "flags.flag_description_hide"));
     }
 
     @Override

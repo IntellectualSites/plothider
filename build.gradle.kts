@@ -13,7 +13,7 @@ configure<JavaPluginConvention> {
     targetCompatibility = sourceCompatibility
 }
 
-version = "4.0.1"
+version = "5.0.0"
 
 repositories {
     mavenCentral()
