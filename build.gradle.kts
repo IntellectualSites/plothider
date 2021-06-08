@@ -1,5 +1,7 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.cadixdev.gradle.licenser.LicenseExtension
+import org.cadixdev.gradle.licenser.Licenser
 
 plugins {
     java
@@ -7,6 +9,7 @@ plugins {
 
     id("net.minecrell.plugin-yml.bukkit") version "0.4.0"
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("org.cadixdev.licenser") version "0.6.0"
 }
 
 the<JavaPluginExtension>().toolchain {
@@ -32,6 +35,12 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-core:7.2.5")
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
+}
+
+configure<LicenseExtension> {
+    header.set(resources.text.fromFile(file("HEADER.txt")))
+    include("**/*.java")
+    newLine.set(false)
 }
 
 bukkit {
