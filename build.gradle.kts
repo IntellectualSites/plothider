@@ -20,13 +20,15 @@ repositories {
     maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
     maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
     maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
+    maven { url = uri("https://maven.enginehub.org/repo/") }
 }
 
 dependencies {
     compileOnlyApi("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Core:5.13.11")
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:5.13.11") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Core:6.0.0-SNAPSHOT")
+    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.5")
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
 }

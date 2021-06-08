@@ -21,14 +21,14 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         new PacketHandler(this);
         Bukkit.getPluginManager().registerEvents(this, this);
-        GlobalFlagContainer.getInstance().addFlag(new HideFlag(false));
+        GlobalFlagContainer.getInstance().addFlag(HideFlag.HIDE_FLAG_FALSE);
         new Metrics(this, BSTATS_ID);
     }
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        PlotPlayer<?> pp = BukkitUtil.getPlayer(player);
+        PlotPlayer<?> pp = BukkitUtil.adapt(player);
         if (Permissions.hasPermission(pp, "plots.plothider.bypass")) {
             return;
         }

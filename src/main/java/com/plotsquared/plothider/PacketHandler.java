@@ -16,6 +16,7 @@ import com.google.common.primitives.Shorts;
 import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.location.Location;
+import com.plotsquared.core.location.World;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
@@ -38,18 +39,18 @@ public class PacketHandler {
                 new PacketAdapter(main, ListenerPriority.NORMAL, PacketType.Play.Server.BLOCK_CHANGE) {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
-                        PlotPlayer<?> pp = BukkitUtil.getPlayer(player);
+                        PlotPlayer<?> pp = BukkitUtil.adapt(player);
                         if (Permissions.hasPermission(pp, "plots.plothider.bypass")) { // Admin bypass
                             return;
                         }
-                        String world = pp.getLocation().getWorld();
-                        if (!PlotSquared.get().hasPlotArea(world)) { // Not a plot area
+                        World<?> world = pp.getLocation().getWorld();
+                        if (!hasPlotArea(world)) { // Not a plot area
                             return;
                         }
                         PacketContainer packet = event.getPacket();
                         StructureModifier<BlockPosition> positions = packet.getBlockPositionModifier();
                         BlockPosition position = positions.read(0);
-                        Location loc = new Location(world, position.getX(), 0, position.getZ());
+                        Location loc = Location.at(world, position.getX(), 0, position.getZ());
                         Plot plot = loc.getOwnedPlot();
                         if (plot != null && (plot.isDenied(pp.getUUID()) || (!plot.isAdded(pp.getUUID())
                                 && plot.getFlag(HideFlag.class)))) {
@@ -63,12 +64,12 @@ public class PacketHandler {
             @Override
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
-                PlotPlayer<?> pp = BukkitUtil.getPlayer(player);
+                PlotPlayer<?> pp = BukkitUtil.adapt(player);
                 if (Permissions.hasPermission(pp, "plots.plothider.bypass")) { // Admin bypass
                     return;
                 }
-                String world = pp.getLocation().getWorld();
-                if (!PlotSquared.get().hasPlotArea(world)) { // Not a plot area
+                World<?> world = pp.getLocation().getWorld();
+                if (!hasPlotArea(world)) { // Not a plot area
                     return;
                 }
                 PacketContainer packet = event.getPacket();
@@ -79,10 +80,10 @@ public class PacketHandler {
                 int cz = chunk.getChunkZ();
                 int bx = cx << 4;
                 int bz = cz << 4;
-                Location corner1 = new Location(world, bx, 0, bz);
-                Location corner2 = new Location(world, bx + 15, 0, bz);
-                Location corner3 = new Location(world, bx, 0, bz + 15);
-                Location corner4 = new Location(world, bx + 15, 0, bz + 15);
+                Location corner1 = Location.at(world, bx, 0, bz);
+                Location corner2 = Location.at(world, bx + 15, 0, bz);
+                Location corner3 = Location.at(world, bx, 0, bz + 15);
+                Location corner4 = Location.at(world, bx + 15, 0, bz + 15);
                 Plot plot1 = corner1.getOwnedPlot();
                 Plot plot2 = corner2.getOwnedPlot();
                 Plot plot3 = corner3.getOwnedPlot();
@@ -128,7 +129,7 @@ public class PacketHandler {
                     // Binary operators give section-relative coordinates.
                     int x = bx + (change >>> 8 & 15);
                     int z = bz + (change >>> 4 & 15);
-                    Plot current = area.getOwnedPlot(new Location(world, x, 0, z));
+                    Plot current = area.getOwnedPlot(Location.at(world, x, 0, z));
                     if (current == null) {
                         continue;
                     }
@@ -152,13 +153,13 @@ public class PacketHandler {
                 new PacketAdapter(main, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
-                        PlotPlayer<?> pp = BukkitUtil.getPlayer(player);
+                        PlotPlayer<?> pp = BukkitUtil.adapt(player);
                         if (Permissions.hasPermission(pp, "plots.plothider.bypass")) { // Admin bypass
                             return;
                         }
 
-                        String world = pp.getLocation().getWorld();
-                        if (!PlotSquared.get().hasPlotArea(world)) { // Not a plot area
+                        World<?> world = pp.getLocation().getWorld();
+                        if (!hasPlotArea(world)) { // Not a plot area
                             return;
                         }
 
@@ -173,10 +174,10 @@ public class PacketHandler {
                         int bx = cx << 4;
                         int bz = cz << 4;
 
-                        Location corner1 = new Location(world, bx, 0, bz);
-                        Location corner2 = new Location(world, bx + 15, 0, bz);
-                        Location corner3 = new Location(world, bx, 0, bz + 15);
-                        Location corner4 = new Location(world, bx + 15, 0, bz + 15);
+                        Location corner1 = Location.at(world, bx, 0, bz);
+                        Location corner2 = Location.at(world, bx + 15, 0, bz);
+                        Location corner3 = Location.at(world, bx, 0, bz + 15);
+                        Location corner4 = Location.at(world, bx + 15, 0, bz + 15);
                         Plot plot1 = corner1.getOwnedPlot();
                         Plot plot2 = corner2.getOwnedPlot();
                         Plot plot3 = corner3.getOwnedPlot();
@@ -264,7 +265,7 @@ public class PacketHandler {
                             int z;
                             for (int x = 0; x < 16; x++) {
                                 for (z = 0; z < 16; z++) {
-                                    Location loc = new Location(world, bx + x, 0, bz + z);
+                                    Location loc = Location.at(world, bx + x, 0, bz + z);
                                     Plot current = area.getOwnedPlot(loc);
                                     if (current != null) {
                                         if ((current == plot1) || (current == plot2) || (current
@@ -294,6 +295,10 @@ public class PacketHandler {
                         }
                     }
                 });
+    }
+
+    private boolean hasPlotArea(World<?> world) {
+        return PlotSquared.get().getPlotAreaManager().hasPlotArea(world.getName());
     }
 
     private int readVarInt(InputStream stream) throws IOException {
