@@ -16,7 +16,7 @@ the<JavaPluginExtension>().toolchain {
     languageVersion.set(JavaLanguageVersion.of(16))
 }
 
-version = "5.0.0"
+version = "5.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    compileOnlyApi("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
+    compileOnlyApi("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.plotsquared:PlotSquared-Core:6.0.0-SNAPSHOT")
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
