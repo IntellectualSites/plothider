@@ -81,7 +81,7 @@ body:
     attributes:
       label: PlotHider Version
       description: What version of PlotHider are you running? (`/version PlotHider`)
-      placeholder: "For example: PlotHider version 4.0.1"
+      placeholder: "For example: PlotHider version 5.0.0"
     validations:
       required: true
 

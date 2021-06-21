@@ -1,6 +1,34 @@
+/*
+ *              _____  _       _   _    _ _     _
+ *              |  __ \| |     | | | |  | (_)   | |
+ *              | |__) | | ___ | |_| |__| |_  __| | ___ _ __
+ *              |  ___/| |/ _ \| __|  __  | |/ _` |/ _ \ '__|
+ *              | |    | | (_) | |_| |  | | | (_| |  __/ |
+ *              |_|    |_|\___/ \__|_|  |_|_|\__,_|\___|_|
+ *               PlotHider PlotSquared addon for Minecraft
+ *                  Copyright (C) 2021 IntellectualSites
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.plotsquared.plothider;
 
 import com.plotsquared.bukkit.util.BukkitUtil;
+import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.Settings;
+import com.plotsquared.core.configuration.caption.CaptionMap;
+import com.plotsquared.core.configuration.caption.load.CaptionLoader;
+import com.plotsquared.core.configuration.caption.load.DefaultCaptionProvider;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.flag.GlobalFlagContainer;
@@ -14,21 +42,61 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
 public class PlotHiderPlugin extends JavaPlugin implements Listener {
 
+    public static final String PLOT_HIDER_NAMESPACE = "plothider";
     private static final int BSTATS_ID = 6412;
 
+    @Override
     public void onEnable() {
         new PacketHandler(this);
         Bukkit.getPluginManager().registerEvents(this, this);
-        GlobalFlagContainer.getInstance().addFlag(new HideFlag(false));
+        GlobalFlagContainer.getInstance().addFlag(HideFlag.HIDE_FLAG_FALSE);
+        try {
+            loadCaptions();
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Failed to load captions", e);
+        }
         new Metrics(this, BSTATS_ID);
+    }
+
+    private void loadCaptions() throws IOException {
+        Path msgFilePath = getDataFolder().toPath().resolve("lang").resolve("messages_en.json");
+        if (!Files.exists(msgFilePath)) {
+            this.saveResource("lang/messages_en.json", false);
+        }
+        CaptionLoader captionLoader = CaptionLoader.of(
+                Locale.ENGLISH,
+                CaptionLoader.patternExtractor(Pattern.compile("messages_(.*)\\.json")),
+                DefaultCaptionProvider.forClassLoaderFormatString(
+                        this.getClass().getClassLoader(),
+                        "lang/messages_%s.json"
+                ),
+                PLOT_HIDER_NAMESPACE
+        );
+        CaptionMap captionMap;
+        if (Settings.Enabled_Components.PER_USER_LOCALE) {
+            captionMap = captionLoader.loadAll(getDataFolder().toPath().resolve("lang"));
+        } else {
+            String fileName = "messages_" + Settings.Enabled_Components.DEFAULT_LOCALE + ".json";
+            captionMap = captionLoader.loadSingle(getDataFolder().toPath().resolve("lang").resolve(fileName));
+        }
+        PlotSquared.get().registerCaptionMap(PLOT_HIDER_NAMESPACE, captionMap);
+        getLogger().info("Loaded caption map for namespace '" + PLOT_HIDER_NAMESPACE + "': "
+                + captionMap.getClass().getCanonicalName());
     }
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        PlotPlayer<?> pp = BukkitUtil.getPlayer(player);
+        PlotPlayer<?> pp = BukkitUtil.adapt(player);
         if (Permissions.hasPermission(pp, "plots.plothider.bypass")) {
             return;
         }
