@@ -16,7 +16,7 @@ the<JavaPluginExtension>().toolchain {
     languageVersion.set(JavaLanguageVersion.of(16))
 }
 
-version = "5.1.0"
+version = "5.1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
