@@ -44,6 +44,7 @@ import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.util.Permissions;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayInputStream;
@@ -52,10 +53,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
 public class PacketHandler {
+    // would be better to check the protocol version but who cares
+    private static final boolean bitSetChunkSections = Bukkit.getUnsafe().getDataVersion() >= 2724;
+
     PacketHandler(PlotHiderPlugin main) {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
         manager.addPacketListener(
@@ -243,7 +248,18 @@ public class PacketHandler {
 
                         int AIR = 0;
 
-                        int bitMask = ints.read(2);
+                        /*
+                         * With 1.17, block section count depends on variable world height
+                         * represented as a BitSet internally. We just use a BitSet for older
+                         * versions too because it performs good enough.
+                         */
+                        BitSet bitMask;
+                        if (bitSetChunkSections) {
+                            bitMask = packet.getSpecificModifier(BitSet.class).read(0);
+                        } else {
+                            int bitMaskLegacy = ints.read(2);
+                            bitMask = intToBitSet(bitMaskLegacy);
+                        }
 
                         byte[] sections = byteArrays.read(0);
                         ByteArrayInputStream buffer = new ByteArrayInputStream(sections);
@@ -252,42 +268,38 @@ public class PacketHandler {
                         List<BlockStorage> array = new ArrayList<>();
 
                         try {
-                            byte[] section;
-                            for (int layer = 0; layer < 16; layer++) {
-                                if ((bitMask >> layer & 0x1) == 1) {
-                                    int start = size - buffer.available();
+                            for (int layer = 0; layer < bitMask.size(); layer++) {
+                                if (bitMask.get(layer)) {
 
-                                    // skip the block count short
-                                    buffer.skip(2);
+                                    int blockCountHigh = buffer.read();
+                                    int blockCountLow = buffer.read();
 
-                                    byte bitsperBlock = (byte) buffer.read();
+                                    short blockCount = (short) ((blockCountHigh & 0xFF) << 8 | (blockCountLow & 0xFF));
 
-                                    if (bitsperBlock <= 8) {
+
+                                    int bitsPerBlock = buffer.read();
+
+                                    ArrayList<Integer> states = new ArrayList<>();
+                                    if (bitsPerBlock <= 8) {
                                         int paletteLength = readVarInt(buffer);
-
+                                        states.ensureCapacity(paletteLength);
                                         for (int i = 0; i < paletteLength; i++) {
-                                            readVarInt(buffer);
+                                            states.add(readVarInt(buffer));
                                         }
                                     }
 
                                     int dataArrayLength = readVarInt(buffer);
 
-                                    for (int i = 0; i < dataArrayLength; i++) {
-                                        // skip all the longs in the data array
-                                        buffer.skip(8);
-                                    }
+                                    // read the actual (compressed) block data
+                                    long[] data = readLongs(buffer, dataArrayLength);
 
-                                    int end = size - buffer.available();
-
-                                    section = Arrays.copyOfRange(sections, start, end);
-
-                                    BlockStorage storage = new BlockStorage(section);
+                                    BlockStorage storage = new BlockStorage(blockCount, bitsPerBlock, states, data);
                                     array.add(storage);
                                 }
                             }
-                            int z;
+
                             for (int x = 0; x < 16; x++) {
-                                for (z = 0; z < 16; z++) {
+                                for (int z = 0; z < 16; z++) {
                                     Location loc = Location.at(world, bx + x, 0, bz + z);
                                     Plot current = area.getOwnedPlot(loc);
                                     if (current != null) {
@@ -295,9 +307,9 @@ public class PacketHandler {
                                                 == plot3) || (current == plot4)) {
                                             for (BlockStorage section1 : array) {
                                                 for (int y = 0; y < 16; y++) {
-                                                    if (section1.get(x, y, z) != 0) {
+                                                    // if (section1.get(x, y, z) != 0) {
                                                         section1.set(x, y, z, AIR);
-                                                    }
+                                                    // }
                                                 }
                                             }
                                         }
@@ -338,5 +350,32 @@ public class PacketHandler {
         } while ((b0 & 128) == 128);
 
         return i;
+    }
+
+    private static BitSet intToBitSet(int n) {
+        BitSet bits = new BitSet(Integer.SIZE);
+        for (int i = 0; i < Integer.SIZE; i++) {
+            if (((n >> i) & 0x1) == 1) {
+                bits.set(i);
+            }
+        }
+        return bits;
+    }
+
+    private static long[] readLongs(ByteArrayInputStream buffer, int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("Array cannot have length less than 0.");
+        }
+
+        long[] l = new long[length];
+        for (int index = 0; index < length; index++) {
+            long result = 0;
+            for (int i = 0; i < Long.BYTES; i++) {
+                result |= (buffer.read() & 0xFFL) << (i << 3);
+            }
+            l[index] = Long.reverseBytes(result); // little endian to big endian conversion
+        }
+
+        return l;
     }
 }

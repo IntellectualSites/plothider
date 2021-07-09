@@ -23,59 +23,29 @@
  */
 package com.plotsquared.plothider;
 
-import org.apache.commons.lang.mutable.MutableInt;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class BlockStorage {
-    private static final Integer AIR = 0x00;
+    private static final int AIR = 0x00;
     private final List<Integer> states;
-    private final int size;
     private final short blockCount;
     private int bitsPerEntry;
     private FlexibleStorage storage;
 
-    public BlockStorage(byte[] in) {
-        MutableInt mut = new MutableInt();
-        this.blockCount = readShort(in, mut);
-
-        this.bitsPerEntry = readUnsigned(in, mut);
-
-        this.states = new LinkedList<>();
-
-        if (this.bitsPerEntry <= 8) {
-            int stateCount = readVarInt(in, mut);
-
-            for (int i = 0; i < stateCount; i++) {
-                this.states.add(readVarInt(in, mut));
-            }
-        }
-
-        int expected = readVarInt(in, mut);
-        this.storage = new FlexibleStorage(this.bitsPerEntry, readLongs(in, mut, expected));
-        this.size = mut.intValue();
+    public BlockStorage(short blockCount, int bitsPerEntry, List<Integer> states, long[] data) {
+        this.blockCount = blockCount;
+        this.bitsPerEntry = bitsPerEntry;
+        this.states = states;
+        this.storage = new FlexibleStorage(this.bitsPerEntry, data);
     }
 
     private static int index(int x, int y, int z) {
         return y << 8 | z << 4 | (x);
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public byte[] write() throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(size);
-        write(out);
-        return out.toByteArray();
-    }
-
-    public void write(ByteArrayOutputStream out) throws IOException {
+    public void write(ByteArrayOutputStream out) {
         long[] data = this.storage.getData();
         writeShort(out, this.blockCount);
         out.write(this.bitsPerEntry);
@@ -87,18 +57,6 @@ public class BlockStorage {
         }
         writeVarInt(out, data.length);
         writeLongs(out, data);
-    }
-
-    public int getBitsPerEntry() {
-        return this.bitsPerEntry;
-    }
-
-    public List<Integer> getStates() {
-        return Collections.unmodifiableList(this.states);
-    }
-
-    public FlexibleStorage getStorage() {
-        return this.storage;
     }
 
     public int get(int x, int y, int z) {
@@ -135,16 +93,6 @@ public class BlockStorage {
         this.storage.set(index(x, y, z), id);
     }
 
-    public boolean isEmpty() {
-        for (int index = 0; index < this.storage.getSize(); index++) {
-            if (this.storage.get(index) != 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     @Override
     public boolean equals(Object o) {
         return o instanceof BlockStorage && this.bitsPerEntry == ((BlockStorage) o).bitsPerEntry
@@ -158,61 +106,6 @@ public class BlockStorage {
         result = 31 * result + this.states.hashCode();
         result = 31 * result + this.storage.hashCode();
         return result;
-    }
-
-    public byte read(byte[] bytes, MutableInt index) {
-        byte value = bytes[index.intValue()];
-        index.increment();
-        return value;
-    }
-
-    public int readUnsigned(byte[] bytes, MutableInt index) {
-        byte value = bytes[index.intValue()];
-        index.increment();
-        return value & 0xFF;
-    }
-
-    public short readShort(byte[] bytes, MutableInt index) {
-        byte hi = bytes[index.intValue()];
-        byte lo = bytes[index.intValue()];
-        index.add(2);
-        return (short) (((hi & 0xFF) << 8) | (lo & 0xFF));
-    }
-
-    public long readLong(byte[] bytes, MutableInt index) {
-        long value = 0;
-        for (int i = 0, j = 56; i < 8; i++, j -= 8) {
-            value += (bytes[i + index.intValue()] & 0xffL) << (j);
-        }
-        index.add(8);
-        return value;
-    }
-
-    public int readVarInt(byte[] bytes, MutableInt index) {
-        int value = 0;
-        int size = 0;
-        int b;
-        while (((b = read(bytes, index)) & 0x80) == 0x80) {
-            value |= (b & 0x7F) << (size++ * 7);
-            if (size > 5) {
-                return 1 / 0;
-            }
-        }
-
-        return value | ((b & 0x7F) << (size * 7));
-    }
-
-    public long[] readLongs(byte[] bytes, MutableInt mut, int length) {
-        if (length < 0) {
-            throw new IllegalArgumentException("Array cannot have length less than 0.");
-        }
-
-        long[] l = new long[length];
-        for (int index = 0; index < length; index++) {
-            l[index] = readLong(bytes, mut);
-        }
-
-        return l;
     }
 
     public void writeShort(ByteArrayOutputStream out, short s) {
