@@ -32,7 +32,7 @@ dependencies {
     compileOnly("com.plotsquared:PlotSquared-Core:6.0.6-SNAPSHOT")
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT") { isTransitive = false }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT")
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.6")
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
 }
