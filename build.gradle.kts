@@ -1,40 +1,45 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.cadixdev.gradle.licenser.LicenseExtension
-import org.cadixdev.gradle.licenser.Licenser
 
 plugins {
     java
     `java-library`
 
-    id("net.minecrell.plugin-yml.bukkit") version "0.4.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("org.cadixdev.licenser") version "0.6.1"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.pluginyml)
+    alias(libs.plugins.licenser)
 }
 
-the<JavaPluginExtension>().toolchain {
-    languageVersion.set(JavaLanguageVersion.of(16))
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+tasks.compileJava.configure {
+    options.release.set(16)
+}
+
+configurations.all {
+    attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
 }
 
 version = "5.1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
-    maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
+    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
     maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
-    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
 }
 
 dependencies {
-    compileOnlyApi("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.0.6-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT") { isTransitive = false }
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.6-SNAPSHOT")
-    implementation("org.bstats:bstats-bukkit:2.2.1")
-    implementation("org.bstats:bstats-base:2.2.1")
+    compileOnly(libs.paper)
+    compileOnly(libs.plotsquaredCore)
+    compileOnly(libs.plotsquaredBukkit) { isTransitive = false }
+    compileOnly(libs.protocollib)
+    compileOnly(libs.worldedit)
+    implementation(libs.bstatsBase)
+    implementation(libs.bstatsBukkit)
 }
 
 configure<LicenseExtension> {
@@ -55,7 +60,7 @@ bukkit {
 
     permissions {
         register("plots.plothider.bypass") {
-            default = BukkitPluginDescription.Permission.Default.FALSE
+            default = BukkitPluginDescription.Permission.Default.OP
         }
     }
 }
