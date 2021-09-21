@@ -1,7 +1,6 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.cadixdev.gradle.licenser.LicenseExtension
-import org.cadixdev.gradle.licenser.Licenser
 
 plugins {
     java
@@ -16,8 +15,6 @@ the<JavaPluginExtension>().toolchain {
     languageVersion.set(JavaLanguageVersion.of(16))
 }
 
-version = "5.1.1-SNAPSHOT"
-
 repositories {
     mavenCentral()
     maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
@@ -29,7 +26,7 @@ repositories {
 
 dependencies {
     compileOnlyApi("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.1.0")
+    compileOnly("com.plotsquared:PlotSquared-Core:6.1.1")
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.1.1") { isTransitive = false }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
     compileOnly("com.sk89q.worldedit:worldedit-core:7.2.6")
@@ -55,7 +52,7 @@ bukkit {
 
     permissions {
         register("plots.plothider.bypass") {
-            default = BukkitPluginDescription.Permission.Default.FALSE
+            default = BukkitPluginDescription.Permission.Default.OP
         }
     }
 }
