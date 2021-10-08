@@ -1,14 +1,13 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.cadixdev.gradle.licenser.LicenseExtension
-import org.cadixdev.gradle.licenser.Licenser
 
 plugins {
     java
     `java-library`
 
     id("net.minecrell.plugin-yml.bukkit") version "0.5.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.0"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 
@@ -29,8 +28,8 @@ repositories {
 
 dependencies {
     compileOnlyApi("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.1.0")
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.1.1") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Core:6.1.2")
+    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.1.2") { isTransitive = false }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
     compileOnly("com.sk89q.worldedit:worldedit-core:7.2.6")
     implementation("org.bstats:bstats-bukkit:2.2.1")
@@ -55,7 +54,7 @@ bukkit {
 
     permissions {
         register("plots.plothider.bypass") {
-            default = BukkitPluginDescription.Permission.Default.FALSE
+            default = BukkitPluginDescription.Permission.Default.OP
         }
     }
 }
