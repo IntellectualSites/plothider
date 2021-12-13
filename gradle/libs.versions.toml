@@ -1,0 +1,35 @@
+[versions]
+# Platform expectations
+paper = "1.17.1-R0.1-SNAPSHOT"
+
+# Plugins
+plotsquared = "6.2.0"
+worldedit = "7.2.8"
+protocollib = "4.7.0"
+
+# Third party
+bstats = "2.2.1"
+
+# Gradle plugins
+shadow = "7.1.0"
+licenser = "0.6.1"
+bukkityml = "0.5.1"
+
+[libraries]
+# Platform expectations
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+
+# Plugins
+plotsquaredCore = { group = "com.plotsquared", name = "PlotSquared-Core", version.ref = "plotsquared" }
+plotsquaredBukkit = { group = "com.plotsquared", name = "PlotSquared-Bukkit", version.ref = "plotsquared" }
+worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.ref = "worldedit" }
+protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
+
+# Third party
+bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }
+bstatsBukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
+
+[plugins]
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
+pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "bukkityml" }

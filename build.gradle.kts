@@ -6,9 +6,9 @@ plugins {
     java
     `java-library`
 
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
-    id("com.github.johnrengelman.shadow") version "7.1.0"
-    id("org.cadixdev.licenser") version "0.6.1"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.pluginyml)
+    alias(libs.plugins.licenser)
 }
 
 the<JavaPluginExtension>().toolchain {
@@ -27,13 +27,13 @@ repositories {
 }
 
 dependencies {
-    compileOnlyApi("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.1.4")
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.1.4") { isTransitive = false }
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.8")
-    implementation("org.bstats:bstats-bukkit:2.2.1")
-    implementation("org.bstats:bstats-base:2.2.1")
+    compileOnly(libs.paper)
+    compileOnly(libs.plotsquaredCore)
+    compileOnly(libs.plotsquaredBukkit) { isTransitive = false }
+    compileOnly(libs.protocollib)
+    compileOnly(libs.worldedit)
+    implementation(libs.bstatsBase)
+    implementation(libs.bstatsBukkit)
 }
 
 configure<LicenseExtension> {
