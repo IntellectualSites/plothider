@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     compileOnlyApi("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.1.4")
+    compileOnly("com.plotsquared:PlotSquared-Core:6.2.0")
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.1.4") { isTransitive = false }
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
     compileOnly("com.sk89q.worldedit:worldedit-core:7.2.8")
