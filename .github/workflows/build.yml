@@ -1,24 +1,24 @@
-name: "build"
+name: build
 
-on: ["pull_request", "push"]
+on: [ pull_request, push ]
 
 jobs:
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - name: "Checkout Repository"
-        uses: "actions/checkout@v2.3.4"
-      - name : "Validate Gradle Wrapper"
-        uses : "gradle/wrapper-validation-action@v1.0.4"
-      - name: "Setup Java"
-        uses: "actions/setup-java@v2.3.1"
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1.0.4
+      - name: Setup Java
+        uses: actions/setup-java@v2.3.1
         with:
-          distribution: "temurin"
-          java-version: "17"
-      - name: "Clean Build"
-        run: "./gradlew clean build"
-      - name : "Archive Artifacts"
-        uses : "actions/upload-artifact@v2.2.4"
-        with :
-          name : "PlotHider-SNAPSHOT"
-          path : "build/libs/*-SNAPSHOT.jar"
+          distribution: temurin
+          java-version: 17
+      - name: Clean Build
+        run: ./gradlew clean build
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: PlotHider-SNAPSHOT
+          path: build/libs/*-SNAPSHOT.jar
