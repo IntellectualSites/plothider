@@ -11,7 +11,7 @@ protocollib = "4.7.0"
 bstats = "2.2.1"
 
 # Gradle plugins
-shadow = "7.1.0"
+shadow = "7.1.1"
 licenser = "0.6.1"
 bukkityml = "0.5.1"
 
