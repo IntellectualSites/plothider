@@ -11,8 +11,16 @@ plugins {
     alias(libs.plugins.licenser)
 }
 
-the<JavaPluginExtension>().toolchain {
-    languageVersion.set(JavaLanguageVersion.of(16))
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+tasks.compileJava.configure {
+    options.release.set(16)
+}
+
+configurations.all {
+    attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
 }
 
 version = "5.1.1-SNAPSHOT"
@@ -20,7 +28,7 @@ version = "5.1.1-SNAPSHOT"
 repositories {
     mavenCentral()
     maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
-    maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
+    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
     maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
