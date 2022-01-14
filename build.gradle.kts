@@ -27,11 +27,9 @@ version = "5.1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
     maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
     maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
-    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
 }
 
 dependencies {
