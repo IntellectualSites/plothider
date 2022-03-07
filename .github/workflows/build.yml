@@ -19,7 +19,7 @@ jobs:
       - name: Clean Build
         run: ./gradlew clean build
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: PlotHider-SNAPSHOT
           path: build/libs/*-SNAPSHOT.jar
