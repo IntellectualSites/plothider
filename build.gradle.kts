@@ -33,13 +33,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.paper)
-    compileOnly(libs.plotsquaredCore)
-    compileOnly(libs.plotsquaredBukkit) { isTransitive = false }
+    implementation(platform("com.intellectualsites.bom:bom-1.18.x:1.4"))
+    compileOnly("io.papermc.paper:paper-api")
+    compileOnly("com.plotsquared:PlotSquared-Core")
+    compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
     compileOnly(libs.protocollib)
     compileOnly(libs.worldedit)
-    implementation(libs.bstatsBase)
-    implementation(libs.bstatsBukkit)
+    implementation("org.bstats:bstats-bukkit")
+    implementation("org.bstats:bstats-base")
 }
 
 configure<LicenseExtension> {
