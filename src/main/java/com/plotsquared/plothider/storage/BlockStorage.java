@@ -58,7 +58,7 @@ public class BlockStorage {
 
             ArrayList<Integer> states = new ArrayList<>();
             if (bitsPerEntry <= 8) {
-                // bitsPerBlock == 0 is an edge case safely ignored here.
+                // bitsPerBlock == 0 is an edge case to handle.
                 if (bitsPerEntry == 0) {
                     int palette = readVarInt(buffer);
                     states.add(palette);
@@ -110,7 +110,7 @@ public class BlockStorage {
 
             // Update storage if necessary.
             if (palettedContainer.getStates().size() > 1 << bitsPerEntry) {
-                bitsPerEntry += 1;
+                bitsPerEntry++;
 
                 List<Integer> oldStates = palettedContainer.getStates();
                 if (bitsPerEntry > 8) {
