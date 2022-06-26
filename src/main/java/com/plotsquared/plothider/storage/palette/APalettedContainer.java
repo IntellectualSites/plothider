@@ -29,6 +29,7 @@ import com.plotsquared.plothider.storage.BlockStorage;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class APalettedContainer {
 
@@ -114,11 +115,22 @@ public abstract class APalettedContainer {
         BlockStorage.writeLongs(out, data);
     }
 
+    @Override
     public boolean equals(Object o) {
-        return (this == o) || (((o instanceof APalettedContainer)) && (this.states.equals(((APalettedContainer) o).states))
-                && (Arrays.equals(this.data, ((APalettedContainer) o).data)) && (this.bitsPerEntry
-                == ((APalettedContainer) o).bitsPerEntry) && (this.size == ((APalettedContainer) o).size) && (
-                this.maxEntryValue == ((APalettedContainer) o).maxEntryValue));
+        if (this == o)
+            return true;
+        if (!(o instanceof APalettedContainer that))
+            return false;
+        return bitsPerEntry == that.bitsPerEntry && size == that.size && maxEntryValue == that.maxEntryValue
+                && palettedContainerType == that.palettedContainerType && states.equals(that.states)
+                && Arrays.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(palettedContainerType, bitsPerEntry, states, size, maxEntryValue);
+        result = 31 * result + Arrays.hashCode(data);
+        return result;
     }
 
     public static APalettedContainer build(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {

@@ -29,6 +29,7 @@ import com.plotsquared.plothider.storage.palette.PalettedContainerType;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Objects;
 
 public class FlexibleStorage {
 
@@ -77,8 +78,16 @@ public class FlexibleStorage {
 
     @Override
     public boolean equals(Object o) {
-        return (this == o) || (((o instanceof FlexibleStorage))
-                && (this.blocksPalletedContainer.equals(((FlexibleStorage) o).blocksPalletedContainer))
-                && (this.biomesPalletedContainer.equals(((FlexibleStorage) o).biomesPalletedContainer)));
+        if (this == o)
+            return true;
+        if (!(o instanceof FlexibleStorage that))
+            return false;
+        return blocksPalletedContainer.equals(that.blocksPalletedContainer)
+                && biomesPalletedContainer.equals(that.biomesPalletedContainer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(blocksPalletedContainer, biomesPalletedContainer);
     }
 }

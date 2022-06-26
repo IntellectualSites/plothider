@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BlockStorage {
     private short blockCount;
@@ -145,8 +146,16 @@ public class BlockStorage {
 
     @Override
     public boolean equals(Object o) {
-        return (this == o) || (o instanceof BlockStorage && this.blockCount == ((BlockStorage) o).blockCount
-                && this.storage.equals(((BlockStorage) o).storage));
+        if (this == o)
+            return true;
+        if (!(o instanceof BlockStorage that))
+            return false;
+        return blockCount == that.blockCount && storage.equals(that.storage);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(blockCount, storage);
     }
 
     private static int index(int x, int y, int z) {

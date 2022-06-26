@@ -24,6 +24,7 @@
 package com.plotsquared.plothider.storage.palette;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PaddedPalettedContainer extends APalettedContainer {
 
@@ -77,5 +78,21 @@ public class PaddedPalettedContainer extends APalettedContainer {
 
     private int cellIndex(int index) {
         return (int) ((long) index * this.divideMulUnsigned + this.divideAddUnsigned >> 32 >> this.divideShift);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof PaddedPalettedContainer that) || !super.equals(o))
+            return false;
+        return valuesPerLong == that.valuesPerLong && divideMul == that.divideMul
+                && divideMulUnsigned == that.divideMulUnsigned && divideAdd == that.divideAdd
+                && divideAddUnsigned == that.divideAddUnsigned && divideShift == that.divideShift;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(valuesPerLong, divideMul, divideMulUnsigned, divideAdd, divideAddUnsigned, divideShift);
     }
 }
