@@ -25,6 +25,11 @@ package com.plotsquared.plothider.storage.palette;
 
 import java.util.List;
 
+/**
+ * Single-valued palette container implementation.
+ *
+ * @since TODO
+ */
 public class SinglePalettedContainer extends APalettedContainer {
 
     public SinglePalettedContainer(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {

@@ -25,6 +25,12 @@ package com.plotsquared.plothider.storage.palette;
 
 import java.util.List;
 
+/**
+ * Legacy and non-padded/overflow palette container implementation.
+ * Used by Minecraft 1.15-.
+ *
+ * @since TODO
+ */
 public class LegacyPalettedContainer extends APalettedContainer {
 
     public LegacyPalettedContainer(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {

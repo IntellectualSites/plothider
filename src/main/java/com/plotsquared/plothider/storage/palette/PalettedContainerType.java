@@ -26,6 +26,6 @@ package com.plotsquared.plothider.storage.palette;
 public enum PalettedContainerType {
 
     BLOCKS,
-    BIOMES;
+    BIOMES
 
 }

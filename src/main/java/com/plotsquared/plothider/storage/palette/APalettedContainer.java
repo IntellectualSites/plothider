@@ -31,6 +31,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Abstract class for the implementation of a palette container storage.
+ * This format is used by Minecraft to store various elements such as blocks and biome in chunk sections.
+ *
+ * @since TODO
+ */
 public abstract class APalettedContainer {
 
     public static final int CHUNK_SECTION_SIZE = 16 * 16 * 16;
@@ -63,16 +69,8 @@ public abstract class APalettedContainer {
         this.maxEntryValue = ((1L << this.bitsPerEntry) - 1);
     }
 
-    public PalettedContainerType getPalettedContainerType() {
-        return palettedContainerType;
-    }
-
     public byte getBitsPerEntry() {
         return bitsPerEntry;
-    }
-
-    public void setBitsPerEntry(byte bitsPerEntry) {
-        this.bitsPerEntry = bitsPerEntry;
     }
 
     public byte getRealUsedBitsPerEntry() {
@@ -83,16 +81,8 @@ public abstract class APalettedContainer {
         return states;
     }
 
-    public long[] getData() {
-        return data;
-    }
-
     public int getSize() {
         return size;
-    }
-
-    public long getMaxEntryValue() {
-        return maxEntryValue;
     }
 
     public abstract int get(int index);

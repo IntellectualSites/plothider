@@ -198,8 +198,8 @@ public class PacketHandler {
                         StructureModifier<Object> chunkData = null;
                         StructureModifier<Object> lightData = null;
 
-                        StructureModifier<byte[]> byteArrays = byteArrays = packet.getByteArrays();
-                        StructureModifier<List<NbtBase<?>>> nbtLists = nbtLists = packet.getListNbtModifier();
+                        StructureModifier<byte[]> byteArrays = packet.getByteArrays();
+                        StructureModifier<List<NbtBase<?>>> nbtLists = packet.getListNbtModifier();
 
                         if (PlotSquared.platform().serverVersion()[1] >= 18) {
                             // 1.18+ behavior, completely revamped chunk packet.

@@ -43,10 +43,6 @@ public class BlockStorage {
         this.storage = new FlexibleStorage();
     }
 
-    public FlexibleStorage getStorage() {
-        return storage;
-    }
-
     public void write(ByteArrayOutputStream out) {
         writeShort(out, this.blockCount);
         storage.write(out);
