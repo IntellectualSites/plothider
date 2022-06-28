@@ -23,7 +23,6 @@
  */
 package com.plotsquared.plothider.storage.palette;
 
-import com.plotsquared.core.PlotSquared;
 import com.plotsquared.plothider.storage.BlockStorage;
 
 import java.io.ByteArrayOutputStream;
@@ -129,11 +128,7 @@ public abstract class APalettedContainer {
             return new SinglePalettedContainer(palettedContainerType, bitsPerEntry, states, data);
 
         // 1.16+
-        if (PlotSquared.platform().serverVersion()[1] >= 16)
-            return new PaddedPalettedContainer(palettedContainerType, bitsPerEntry, states, data);
-
-        // 1.15-
-        return new LegacyPalettedContainer(palettedContainerType, bitsPerEntry, states, data);
+        return new PaddedPalettedContainer(palettedContainerType, bitsPerEntry, states, data);
     }
 
     public static byte getRealUsedBits(byte bits) {

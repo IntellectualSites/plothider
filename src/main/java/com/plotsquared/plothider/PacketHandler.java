@@ -196,23 +196,18 @@ public class PacketHandler {
 
                         // 1.18+
                         StructureModifier<Object> chunkData = null;
-                        StructureModifier<Object> lightData = null;
 
                         StructureModifier<byte[]> byteArrays = packet.getByteArrays();
                         StructureModifier<List<NbtBase<?>>> nbtLists = packet.getListNbtModifier();
 
                         if (PlotSquared.platform().serverVersion()[1] >= 18) {
                             // 1.18+ behavior, completely revamped chunk packet.
-                            // TODO See https://github.com/dmulloy2/ProtocolLib/pull/1592
+                            // TODO See https://github.com/dmulloy2/ProtocolLib/pull/1592 later (v5 release).
                             chunkData = (StructureModifier<Object>) packet.getSpecificModifier(
                                             packetModifier.getField(2).getType())
                                     .withTarget(packetModifier.read(2));
-                            lightData = (StructureModifier<Object>) packet.getSpecificModifier(
-                                            packetModifier.getField(3).getType())
-                                    .withTarget(packetModifier.read(3));
 
                             loadInternalFields(chunkData, packetModifier.getField(2).getType());
-                            loadInternalFields(lightData, packetModifier.getField(3).getType());
                         }
 
                         // Chunk X,Z & Block X,Z
@@ -281,7 +276,7 @@ public class PacketHandler {
                         BitSet bitMask;
                         int sectionsSize = 0;
                         if (PlotSquared.platform().serverVersion()[1] >= 17) {
-                            if (lightData != null) {
+                            if (chunkData != null) {
                                 // 1.18+
                                 sectionsSize = SECTIONS_PER_CHUNK;
                             } else {
@@ -390,6 +385,12 @@ public class PacketHandler {
         return bits;
     }
 
+    /**
+     * Worldaround method to dynamically inject fields into a custom non-implemented structure modifier.
+     *
+     * @param structureModifier the custom structureModifier where to inject the fields
+     * @param type              the structure modifier hold class type
+     */
     private static void loadInternalFields(StructureModifier<?> structureModifier, Class<?> type) {
         List<Field> fields = getFields(type);
 
@@ -402,6 +403,12 @@ public class PacketHandler {
         }
     }
 
+    /**
+     * Fetch all the declared non-static fields of a class.
+     *
+     * @param type the class to fetch the fields from
+     * @return the type fields
+     */
     private static List<Field> getFields(Class<?> type) {
         List<Field> result = new ArrayList<>();
 

@@ -23,7 +23,6 @@
  */
 package com.plotsquared.plothider.storage;
 
-import com.plotsquared.core.PlotSquared;
 import com.plotsquared.plothider.storage.palette.APalettedContainer;
 import com.plotsquared.plothider.storage.palette.PalettedContainerType;
 
@@ -42,10 +41,8 @@ public class FlexibleStorage {
     }
 
     public FlexibleStorage(byte bitsPerEntry, List<Integer> states, int bytes) {
-        this(bitsPerEntry, states, new long[PlotSquared.platform().serverVersion()[1] >= 16
-                ? (bytes + ((char) (64 / APalettedContainer.getRealUsedBits(bitsPerEntry))) - 1)
-                / ((char) (64 / APalettedContainer.getRealUsedBits(bitsPerEntry)))
-                : bytes * APalettedContainer.getRealUsedBits(bitsPerEntry) / 64]);
+        this(bitsPerEntry, states, new long[(bytes + ((char) (64 / APalettedContainer.getRealUsedBits(bitsPerEntry))) - 1)
+                / ((char) (64 / APalettedContainer.getRealUsedBits(bitsPerEntry)))]);
     }
 
     public FlexibleStorage(byte bitsPerEntry, List<Integer> states, long[] data) {
