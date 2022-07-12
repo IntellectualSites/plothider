@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @since TODO
  */
-public class SinglePalettedContainer extends APalettedContainer {
+public class SinglePalettedContainer extends PalettedContainer {
 
     public SinglePalettedContainer(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {
         super(palettedContainerType, bitsPerEntry, states, data);

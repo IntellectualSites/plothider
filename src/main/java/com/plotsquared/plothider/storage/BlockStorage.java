@@ -23,7 +23,7 @@
  */
 package com.plotsquared.plothider.storage;
 
-import com.plotsquared.plothider.storage.palette.APalettedContainer;
+import com.plotsquared.plothider.storage.palette.PalettedContainer;
 import com.plotsquared.plothider.storage.palette.PalettedContainerType;
 
 import java.io.ByteArrayInputStream;
@@ -73,7 +73,7 @@ public class BlockStorage {
             // Read the actual (compressed) block data.
             long[] data = BlockStorage.readLongs(buffer, dataArrayLength);
 
-            APalettedContainer palettedContainer = APalettedContainer.build(palettedContainerType, bitsPerEntry, states, data);
+            PalettedContainer palettedContainer = PalettedContainer.build(palettedContainerType, bitsPerEntry, states, data);
             if (palettedContainerType == PalettedContainerType.BLOCKS) {
                 storage.setBlocksPalletedContainer(palettedContainer);
             } else {
@@ -85,18 +85,18 @@ public class BlockStorage {
     }
 
     public int getBlock(int x, int y, int z) {
-        APalettedContainer palettedContainer = this.storage.getBlocksPalletedContainer();
+        PalettedContainer palettedContainer = this.storage.getBlocksPalletedContainer();
 
         int id = palettedContainer.get(index(x, y, z));
         return palettedContainer.getBitsPerEntry() <= 8 ?
                 (id >= 0 && id < palettedContainer.getStates().size()
                         ? palettedContainer.getStates().get(id)
-                        : APalettedContainer.AIR) :
+                        : PalettedContainer.AIR) :
                 id;
     }
 
     public void setBlock(int x, int y, int z, int state) {
-        APalettedContainer palettedContainer = this.storage.getBlocksPalletedContainer();
+        PalettedContainer palettedContainer = this.storage.getBlocksPalletedContainer();
         byte bitsPerEntry = palettedContainer.getBitsPerEntry();
 
         int id = bitsPerEntry <= 8
@@ -113,7 +113,7 @@ public class BlockStorage {
                 if (bitsPerEntry > 8) {
                     oldStates = new ArrayList<>(palettedContainer.getStates());
                     palettedContainer.getStates().clear();
-                    bitsPerEntry = APalettedContainer.DIRECT_PALETTE_SIZE;
+                    bitsPerEntry = PalettedContainer.DIRECT_PALETTE_SIZE;
                 }
                 FlexibleStorage oldStorage = this.storage;
                 this.storage = new FlexibleStorage(bitsPerEntry, palettedContainer.getStates(),
@@ -136,7 +136,7 @@ public class BlockStorage {
         // Make the changes.
         palettedContainer.set(index(x, y, z), id);
 
-        if (state == APalettedContainer.AIR)
+        if (state == PalettedContainer.AIR)
             blockCount--;
     }
 

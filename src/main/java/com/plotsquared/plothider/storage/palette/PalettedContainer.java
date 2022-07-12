@@ -36,7 +36,7 @@ import java.util.Objects;
  *
  * @since TODO
  */
-public abstract class APalettedContainer {
+public abstract class PalettedContainer {
 
     public static final int CHUNK_SECTION_SIZE = 16 * 16 * 16;
     public static final int BIOME_SECTION_SIZE = 4 * 4 * 4;
@@ -51,7 +51,7 @@ public abstract class APalettedContainer {
     protected int size;
     protected final long maxEntryValue;
 
-    public APalettedContainer(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {
+    public PalettedContainer(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {
         // Yes, bitsPerEntry may be equal to 0. https://wiki.vg/Chunk_Format#Data_structure
         if ((bitsPerEntry < 0)) {
             throw new IllegalArgumentException(
@@ -63,8 +63,8 @@ public abstract class APalettedContainer {
         this.data = data;
 
         this.size = palettedContainerType == PalettedContainerType.BLOCKS
-                ? APalettedContainer.CHUNK_SECTION_SIZE
-                : APalettedContainer.BIOME_SECTION_SIZE;
+                ? PalettedContainer.CHUNK_SECTION_SIZE
+                : PalettedContainer.BIOME_SECTION_SIZE;
         this.maxEntryValue = ((1L << this.bitsPerEntry) - 1);
     }
 
@@ -108,7 +108,7 @@ public abstract class APalettedContainer {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof APalettedContainer that))
+        if (!(o instanceof PalettedContainer that))
             return false;
         return bitsPerEntry == that.bitsPerEntry && size == that.size && maxEntryValue == that.maxEntryValue
                 && palettedContainerType == that.palettedContainerType && states.equals(that.states)
@@ -122,7 +122,7 @@ public abstract class APalettedContainer {
         return result;
     }
 
-    public static APalettedContainer build(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {
+    public static PalettedContainer build(PalettedContainerType palettedContainerType, byte bitsPerEntry, List<Integer> states, long[] data) {
         // Special case for single-valued palette.
         if (bitsPerEntry == 0)
             return new SinglePalettedContainer(palettedContainerType, bitsPerEntry, states, data);

@@ -46,7 +46,7 @@ import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.util.Permissions;
 import com.plotsquared.plothider.storage.BlockStorage;
-import com.plotsquared.plothider.storage.palette.APalettedContainer;
+import com.plotsquared.plothider.storage.palette.PalettedContainer;
 import com.plotsquared.plothider.storage.palette.PalettedContainerType;
 import org.bukkit.entity.Player;
 
@@ -340,8 +340,8 @@ public class PacketHandler {
                                                 == plot3) || (current == plot4)) {
                                             for (BlockStorage section1 : array) {
                                                 for (int y = 0; y < 16; y++) {
-                                                    if (section1.getBlock(x, y, z) != APalettedContainer.AIR) {
-                                                        section1.setBlock(x, y, z, APalettedContainer.AIR);
+                                                    if (section1.getBlock(x, y, z) != PalettedContainer.AIR) {
+                                                        section1.setBlock(x, y, z, PalettedContainer.AIR);
                                                     }
                                                 }
                                             }

@@ -23,7 +23,7 @@
  */
 package com.plotsquared.plothider.storage;
 
-import com.plotsquared.plothider.storage.palette.APalettedContainer;
+import com.plotsquared.plothider.storage.palette.PalettedContainer;
 import com.plotsquared.plothider.storage.palette.PalettedContainerType;
 
 import java.io.ByteArrayOutputStream;
@@ -32,8 +32,8 @@ import java.util.Objects;
 
 public class FlexibleStorage {
 
-    private APalettedContainer blocksPalletedContainer;
-    private APalettedContainer biomesPalletedContainer;
+    private PalettedContainer blocksPalletedContainer;
+    private PalettedContainer biomesPalletedContainer;
 
     public FlexibleStorage() {
         this.blocksPalletedContainer = null;
@@ -41,28 +41,28 @@ public class FlexibleStorage {
     }
 
     public FlexibleStorage(byte bitsPerEntry, List<Integer> states, int bytes) {
-        this(bitsPerEntry, states, new long[(bytes + ((char) (64 / APalettedContainer.getRealUsedBits(bitsPerEntry))) - 1)
-                / ((char) (64 / APalettedContainer.getRealUsedBits(bitsPerEntry)))]);
+        this(bitsPerEntry, states, new long[(bytes + ((char) (64 / PalettedContainer.getRealUsedBits(bitsPerEntry))) - 1)
+                / ((char) (64 / PalettedContainer.getRealUsedBits(bitsPerEntry)))]);
     }
 
     public FlexibleStorage(byte bitsPerEntry, List<Integer> states, long[] data) {
-        this.blocksPalletedContainer = APalettedContainer.build(PalettedContainerType.BLOCKS, bitsPerEntry, states, data);
+        this.blocksPalletedContainer = PalettedContainer.build(PalettedContainerType.BLOCKS, bitsPerEntry, states, data);
         this.biomesPalletedContainer = null;
     }
 
-    public APalettedContainer getBlocksPalletedContainer() {
+    public PalettedContainer getBlocksPalletedContainer() {
         return blocksPalletedContainer;
     }
 
-    public APalettedContainer getBiomesPalletedContainer() {
+    public PalettedContainer getBiomesPalletedContainer() {
         return biomesPalletedContainer;
     }
 
-    public void setBlocksPalletedContainer(APalettedContainer blocksPalletedContainer) {
+    public void setBlocksPalletedContainer(PalettedContainer blocksPalletedContainer) {
         this.blocksPalletedContainer = blocksPalletedContainer;
     }
 
-    public void setBiomesPalletedContainer(APalettedContainer biomesPalletedContainer) {
+    public void setBiomesPalletedContainer(PalettedContainer biomesPalletedContainer) {
         this.biomesPalletedContainer = biomesPalletedContainer;
     }
 
