@@ -30,6 +30,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.FuzzyReflection;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
@@ -44,22 +45,20 @@ import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.util.Permissions;
-import org.bukkit.Bukkit;
+import com.plotsquared.plothider.storage.BlockStorage;
+import com.plotsquared.plothider.storage.palette.PalettedContainer;
+import com.plotsquared.plothider.storage.palette.PalettedContainerType;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 public class PacketHandler {
-    // would be better to check the protocol version but who cares
-    private static final boolean bitSetChunkSections = Bukkit.getUnsafe().getDataVersion() >= 2724;
+
+    private static final int SECTIONS_PER_CHUNK = (PlotSquared.platform().versionMaxHeight() + 1 - PlotSquared.platform().versionMinHeight()) >> 4;
 
     PacketHandler(PlotHiderPlugin main) {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
@@ -92,11 +91,11 @@ public class PacketHandler {
             @Override
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
-                PlotPlayer<?> pp = BukkitUtil.adapt(player);
-                if (Permissions.hasPermission(pp, "plots.plothider.bypass")) { // Admin bypass
+                PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
+                if (Permissions.hasPermission(plotPlayer, "plots.plothider.bypass")) { // Admin bypass
                     return;
                 }
-                World<?> world = pp.getLocation().getWorld();
+                World<?> world = plotPlayer.getLocation().getWorld();
                 if (!hasPlotArea(world)) { // Not a plot area
                     return;
                 }
@@ -117,16 +116,16 @@ public class PacketHandler {
                 Plot plot3 = corner3.getOwnedPlot();
                 Plot plot4 = corner4.getOwnedPlot();
                 plot1 =
-                        (plot1 != null && (plot1.isDenied(pp.getUUID()) || (!plot1.isAdded(pp.getUUID())
+                        (plot1 != null && (plot1.isDenied(plotPlayer.getUUID()) || (!plot1.isAdded(plotPlayer.getUUID())
                                 && plot1.getFlag(HideFlag.class)))) ? plot1 : null;
                 plot2 =
-                        (plot2 != null && (plot2.isDenied(pp.getUUID()) || (!plot2.isAdded(pp.getUUID())
+                        (plot2 != null && (plot2.isDenied(plotPlayer.getUUID()) || (!plot2.isAdded(plotPlayer.getUUID())
                                 && plot2.getFlag(HideFlag.class)))) ? plot2 : null;
                 plot3 =
-                        (plot3 != null && (plot3.isDenied(pp.getUUID()) || (!plot3.isAdded(pp.getUUID())
+                        (plot3 != null && (plot3.isDenied(plotPlayer.getUUID()) || (!plot3.isAdded(plotPlayer.getUUID())
                                 && plot3.getFlag(HideFlag.class)))) ? plot3 : null;
                 plot4 =
-                        (plot4 != null && (plot4.isDenied(pp.getUUID()) || (!plot4.isAdded(pp.getUUID())
+                        (plot4 != null && (plot4.isDenied(plotPlayer.getUUID()) || (!plot4.isAdded(plotPlayer.getUUID())
                                 && plot4.getFlag(HideFlag.class)))) ? plot4 : null;
                 if (plot1 == null && plot2 == null && plot3 == null
                         && plot4 == null) { // No plots to hide
@@ -181,20 +180,35 @@ public class PacketHandler {
                 new PacketAdapter(main, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
-                        PlotPlayer<?> pp = BukkitUtil.adapt(player);
-                        if (Permissions.hasPermission(pp, "plots.plothider.bypass")) { // Admin bypass
+                        PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
+                        if (Permissions.hasPermission(plotPlayer, "plots.plothider.bypass")) { // Admin bypass
                             return;
                         }
 
-                        World<?> world = pp.getLocation().getWorld();
+                        World<?> world = plotPlayer.getLocation().getWorld();
                         if (!hasPlotArea(world)) { // Not a plot area
                             return;
                         }
 
                         PacketContainer packet = event.getPacket();
+                        StructureModifier<Object> packetModifier = packet.getModifier();
                         StructureModifier<Integer> ints = packet.getIntegers();
+
+                        // 1.18+
+                        StructureModifier<Object> chunkData = null;
+
                         StructureModifier<byte[]> byteArrays = packet.getByteArrays();
                         StructureModifier<List<NbtBase<?>>> nbtLists = packet.getListNbtModifier();
+
+                        if (PlotSquared.platform().serverVersion()[1] >= 18) {
+                            // 1.18+ behavior, completely revamped chunk packet.
+                            // TODO See https://github.com/dmulloy2/ProtocolLib/pull/1592 later (v5 release).
+                            chunkData = (StructureModifier<Object>) packet.getSpecificModifier(
+                                            packetModifier.getField(2).getType())
+                                    .withTarget(packetModifier.read(2));
+
+                            loadInternalFields(chunkData, packetModifier.getField(2).getType());
+                        }
 
                         // Chunk X,Z & Block X,Z
                         int cx = ints.read(0);
@@ -211,20 +225,20 @@ public class PacketHandler {
                         Plot plot3 = corner3.getOwnedPlot();
                         Plot plot4 = corner4.getOwnedPlot();
 
-                        plot1 = (plot1 != null && (plot1.isDenied(pp.getUUID()) || (
-                                !plot1.isAdded(pp.getUUID()) && plot1.getFlag(HideFlag.class)))) ?
+                        plot1 = (plot1 != null && (plot1.isDenied(plotPlayer.getUUID()) || (
+                                !plot1.isAdded(plotPlayer.getUUID()) && plot1.getFlag(HideFlag.class)))) ?
                                 plot1 :
                                 null;
-                        plot2 = (plot2 != null && (plot2.isDenied(pp.getUUID()) || (
-                                !plot2.isAdded(pp.getUUID()) && plot2.getFlag(HideFlag.class)))) ?
+                        plot2 = (plot2 != null && (plot2.isDenied(plotPlayer.getUUID()) || (
+                                !plot2.isAdded(plotPlayer.getUUID()) && plot2.getFlag(HideFlag.class)))) ?
                                 plot2 :
                                 null;
-                        plot3 = (plot3 != null && (plot3.isDenied(pp.getUUID()) || (
-                                !plot3.isAdded(pp.getUUID()) && plot3.getFlag(HideFlag.class)))) ?
+                        plot3 = (plot3 != null && (plot3.isDenied(plotPlayer.getUUID()) || (
+                                !plot3.isAdded(plotPlayer.getUUID()) && plot3.getFlag(HideFlag.class)))) ?
                                 plot3 :
                                 null;
-                        plot4 = (plot4 != null && (plot4.isDenied(pp.getUUID()) || (
-                                !plot4.isAdded(pp.getUUID()) && plot4.getFlag(HideFlag.class)))) ?
+                        plot4 = (plot4 != null && (plot4.isDenied(plotPlayer.getUUID()) || (
+                                !plot4.isAdded(plotPlayer.getUUID()) && plot4.getFlag(HideFlag.class)))) ?
                                 plot4 :
                                 null;
 
@@ -234,8 +248,16 @@ public class PacketHandler {
                         }
 
                         if (plot1 == plot4 && plot1 != null) { // Not allowed to see the entire chunk
-                            byteArrays.write(0, new byte[byteArrays.read(0).length]);
-                            nbtLists.write(0, new ArrayList<>());
+                            if (chunkData != null) {
+                                // 1.18+
+                                // Replaces buffer, i.e. chunk data.
+                                chunkData.write(1, new byte[((byte[]) chunkData.read(1)).length]);
+                                chunkData.write(2, new ArrayList<>());
+                            } else if (byteArrays != null) {
+                                // 1.17-
+                                byteArrays.write(0, new byte[byteArrays.read(0).length]);
+                                nbtLists.write(0, new ArrayList<>());
+                            }
                             event.setPacket(packet);
                             return;
                         }
@@ -246,56 +268,67 @@ public class PacketHandler {
                                 plot2 != null ? plot2 : plot3 != null ? plot3 : plot4;
                         PlotArea area = denied.getArea();
 
-                        int AIR = 0;
-
                         /*
                          * With 1.17, block section count depends on variable world height
                          * represented as a BitSet internally. We just use a BitSet for older
                          * versions too because it performs good enough.
                          */
                         BitSet bitMask;
-                        if (bitSetChunkSections) {
-                            bitMask = packet.getSpecificModifier(BitSet.class).read(0);
+                        int sectionsSize = 0;
+                        if (PlotSquared.platform().serverVersion()[1] >= 17) {
+                            if (chunkData != null) {
+                                // 1.18+
+                                sectionsSize = SECTIONS_PER_CHUNK;
+                            } else {
+                                // 1.17 unique BitSet behavior.
+                                bitMask = packet.getSpecificModifier(BitSet.class).read(0);
+
+                                for (int layer = 0; layer < bitMask.size(); layer++) {
+                                    if (bitMask.get(layer))
+                                        sectionsSize += 1;
+                                }
+                            }
                         } else {
                             int bitMaskLegacy = ints.read(2);
                             bitMask = intToBitSet(bitMaskLegacy);
+
+                            for (int layer = 0; layer < bitMask.size(); layer++) {
+                                if (bitMask.get(layer))
+                                    sectionsSize += 1;
+                            }
                         }
 
-                        byte[] sections = byteArrays.read(0);
+                        byte[] sections;
+                        if (chunkData != null) {
+                            // 1.18+
+                            sections = (byte[]) chunkData.read(1);
+                        } else {
+                            // 1.17-
+                            sections = byteArrays.read(0);
+                        }
+
                         ByteArrayInputStream buffer = new ByteArrayInputStream(sections);
                         int size = sections.length;
 
                         List<BlockStorage> array = new ArrayList<>();
 
                         try {
-                            for (int layer = 0; layer < bitMask.size(); layer++) {
-                                if (bitMask.get(layer)) {
+                            for (int layer = 0; layer < sectionsSize; layer++) {
+                                // Both values represent a short.
+                                int blockCountHigh = buffer.read();
+                                int blockCountLow = buffer.read();
 
-                                    int blockCountHigh = buffer.read();
-                                    int blockCountLow = buffer.read();
+                                short blockCount = (short) ((blockCountHigh & 0xFF) << 8 | (blockCountLow & 0xFF));
 
-                                    short blockCount = (short) ((blockCountHigh & 0xFF) << 8 | (blockCountLow & 0xFF));
+                                BlockStorage storage = new BlockStorage(blockCount);
 
-
-                                    int bitsPerBlock = buffer.read();
-
-                                    ArrayList<Integer> states = new ArrayList<>();
-                                    if (bitsPerBlock <= 8) {
-                                        int paletteLength = readVarInt(buffer);
-                                        states.ensureCapacity(paletteLength);
-                                        for (int i = 0; i < paletteLength; i++) {
-                                            states.add(readVarInt(buffer));
-                                        }
-                                    }
-
-                                    int dataArrayLength = readVarInt(buffer);
-
-                                    // read the actual (compressed) block data
-                                    long[] data = readLongs(buffer, dataArrayLength);
-
-                                    BlockStorage storage = new BlockStorage(blockCount, bitsPerBlock, states, data);
-                                    array.add(storage);
+                                storage.read(buffer, PalettedContainerType.BLOCKS);
+                                if (chunkData != null) {
+                                    // 1.18+, also contains biomes.
+                                    storage.read(buffer, PalettedContainerType.BIOMES);
                                 }
+
+                                array.add(storage);
                             }
 
                             for (int x = 0; x < 16; x++) {
@@ -307,22 +340,28 @@ public class PacketHandler {
                                                 == plot3) || (current == plot4)) {
                                             for (BlockStorage section1 : array) {
                                                 for (int y = 0; y < 16; y++) {
-                                                    // if (section1.get(x, y, z) != 0) {
-                                                        section1.set(x, y, z, AIR);
-                                                    // }
+                                                    if (section1.getBlock(x, y, z) != PalettedContainer.AIR) {
+                                                        section1.setBlock(x, y, z, PalettedContainer.AIR);
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+
                             ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
                             for (BlockStorage section1 : array) {
                                 section1.write(baos);
                             }
-                            byteArrays.write(0, baos.toByteArray());
 
-                            List<NbtBase<?>> nbtList = nbtLists.read(0);
+                            if (chunkData != null) {
+                                // 1.18+
+                                chunkData.write(1, baos.toByteArray());
+                            } else {
+                                // 1.17-
+                                byteArrays.write(0, baos.toByteArray());
+                            }
 
                             event.setPacket(packet);
                         } catch (Throwable e) {
@@ -336,22 +375,6 @@ public class PacketHandler {
         return PlotSquared.get().getPlotAreaManager().hasPlotArea(world.getName());
     }
 
-    private int readVarInt(InputStream stream) throws IOException {
-        int i = 0;
-        int j = 0;
-
-        byte b0;
-        do {
-            b0 = (byte) stream.read();
-            i |= (b0 & 127) << j++ * 7;
-            if (j > 5) {
-                throw new RuntimeException("VarInt too big");
-            }
-        } while ((b0 & 128) == 128);
-
-        return i;
-    }
-
     private static BitSet intToBitSet(int n) {
         BitSet bits = new BitSet(Integer.SIZE);
         for (int i = 0; i < Integer.SIZE; i++) {
@@ -362,20 +385,42 @@ public class PacketHandler {
         return bits;
     }
 
-    private static long[] readLongs(ByteArrayInputStream buffer, int length) {
-        if (length < 0) {
-            throw new IllegalArgumentException("Array cannot have length less than 0.");
-        }
+    /**
+     * Worldaround method to dynamically inject fields into a custom non-implemented structure modifier.
+     *
+     * @param structureModifier the custom structureModifier where to inject the fields
+     * @param type              the structure modifier hold class type
+     */
+    private static void loadInternalFields(StructureModifier<?> structureModifier, Class<?> type) {
+        List<Field> fields = getFields(type);
 
-        long[] l = new long[length];
-        for (int index = 0; index < length; index++) {
-            long result = 0;
-            for (int i = 0; i < Long.BYTES; i++) {
-                result |= (buffer.read() & 0xFFL) << (i << 3);
+        try {
+            Field data = StructureModifier.class.getDeclaredField("data");
+            data.setAccessible(true);
+            data.set(structureModifier, fields);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Fetch all the declared non-static fields of a class.
+     *
+     * @param type the class to fetch the fields from
+     * @return the type fields
+     */
+    private static List<Field> getFields(Class<?> type) {
+        List<Field> result = new ArrayList<>();
+
+        // Retrieve every private and public field
+        for (Field field : FuzzyReflection.fromClass(type, true).getDeclaredFields(null)) {
+            int mod = field.getModifiers();
+
+            // Ignore static fields
+            if (!Modifier.isStatic(mod)) {
+                result.add(field);
             }
-            l[index] = Long.reverseBytes(result); // little endian to big endian conversion
         }
-
-        return l;
+        return result;
     }
 }

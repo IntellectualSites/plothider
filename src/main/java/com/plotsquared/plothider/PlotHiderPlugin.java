@@ -105,7 +105,7 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
                 .getFlag(HideFlag.class)))) {
             Location to = event.getTo();
             Location from = event.getFrom();
-            if ((to.getWorld().equals(from.getWorld())) && (to.distanceSquared(from) < 8.0D)) {
+            if (to.getWorld() == from.getWorld() && to.distanceSquared(from) < 8.0D) {
                 event.setTo(player.getLocation());
                 event.setCancelled(true);
                 player.setVelocity(player.getVelocity());
