@@ -23,6 +23,6 @@ jobs:
       - name: Upload Release Assets
         uses: AButler/upload-release-assets@v2.0
         with:
-          files: 'build/libs/PlotHider-*.jar'
+          files: 'build/libs/plothider-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.event.release.tag_name }}
