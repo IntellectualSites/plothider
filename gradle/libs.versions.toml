@@ -4,7 +4,7 @@ paper = "1.19-R0.1-SNAPSHOT"
 
 # Plugins
 worldedit = "7.2.10"
-protocollib = "4.8.0"
+protocollib = "5.0.0-SNAPSHOT"
 
 # Third party
 bstats = "3.0.0"
