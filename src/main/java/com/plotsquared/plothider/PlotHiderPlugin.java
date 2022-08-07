@@ -91,12 +91,12 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-        if (plotPlayer.hasPermission("plots.plothider.bypass")) {
+        PlotPlayer<?> pp = BukkitUtil.adapt(player);
+        if (Permissions.hasPermission(pp, "plots.plothider.bypass")) {
             return;
         }
-        Plot plot = plotPlayer.getCurrentPlot();
-        if (plot != null && (plot.isDenied(plotPlayer.getUUID()) || (!plot.isAdded(plotPlayer.getUUID()) && plot
+        Plot plot = pp.getCurrentPlot();
+        if (plot != null && (plot.isDenied(pp.getUUID()) || (!plot.isAdded(pp.getUUID()) && plot
                 .getFlag(HideFlag.class)))) {
             Location to = event.getTo();
             Location from = event.getFrom();
