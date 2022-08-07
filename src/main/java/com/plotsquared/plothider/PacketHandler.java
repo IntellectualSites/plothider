@@ -25,11 +25,11 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.reflect.FuzzyReflection;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
+import com.comphenix.protocol.wrappers.WrappedLevelChunkData;
 import com.comphenix.protocol.wrappers.nbt.NbtBase;
 import com.google.common.primitives.Shorts;
 import com.plotsquared.bukkit.util.BukkitUtil;
@@ -46,8 +46,6 @@ import org.bukkit.entity.Player;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class PacketHandler {
@@ -166,24 +164,14 @@ public class PacketHandler {
                         }
 
                         PacketContainer packet = event.getPacket();
-                        StructureModifier<Object> packetModifier = packet.getModifier();
                         StructureModifier<Integer> ints = packet.getIntegers();
 
                         // 1.18+
-                        StructureModifier<Object> chunkData = null;
+                        StructureModifier<WrappedLevelChunkData.ChunkData> chunkDataModifier = packet.getLevelChunkData();
+                        WrappedLevelChunkData.ChunkData chunkData = chunkDataModifier.read(0);
 
                         StructureModifier<byte[]> byteArrays = packet.getByteArrays();
                         StructureModifier<List<NbtBase<?>>> nbtLists = packet.getListNbtModifier();
-
-                        if (PlotSquared.platform().serverVersion()[1] >= 18) {
-                            // 1.18+ behavior, completely revamped chunk packet.
-                            // TODO See https://github.com/dmulloy2/ProtocolLib/pull/1592 later (v5 release).
-                            chunkData = (StructureModifier<Object>) packet.getSpecificModifier(
-                                            packetModifier.getField(2).getType())
-                                    .withTarget(packetModifier.read(2));
-
-                            loadInternalFields(chunkData, packetModifier.getField(2).getType());
-                        }
 
                         // Chunk X,Z & Block X,Z
                         int cx = ints.read(0);
@@ -214,8 +202,8 @@ public class PacketHandler {
                             if (chunkData != null) {
                                 // 1.18+
                                 // Replaces buffer, i.e. chunk data.
-                                chunkData.write(1, new byte[((byte[]) chunkData.read(1)).length]);
-                                chunkData.write(2, new ArrayList<>());
+                                chunkData.setBuffer(new byte[chunkData.getBuffer().length]);
+                                chunkData.setBlockEntityInfo(Collections.emptyList());
                             } else if (byteArrays != null) {
                                 // 1.17-
                                 byteArrays.write(0, new byte[byteArrays.read(0).length]);
@@ -264,7 +252,7 @@ public class PacketHandler {
                         byte[] sections;
                         if (chunkData != null) {
                             // 1.18+
-                            sections = (byte[]) chunkData.read(1);
+                            sections = chunkData.getBuffer();
                         } else {
                             // 1.17-
                             sections = byteArrays.read(0);
@@ -320,7 +308,20 @@ public class PacketHandler {
 
                             if (chunkData != null) {
                                 // 1.18+
-                                chunkData.write(1, baos.toByteArray());
+                                chunkData.setBuffer(baos.toByteArray());
+
+                                // Also remove block entities.
+                                List<WrappedLevelChunkData.BlockEntityInfo> newBlockEntities = new ArrayList<>();
+                                for (WrappedLevelChunkData.BlockEntityInfo blockEntity : chunkData.getBlockEntityInfo()) {
+                                    Location loc = Location.at(world, bx + blockEntity.getSectionX(), blockEntity.getY(), bz + blockEntity.getSectionZ());
+                                    Plot current = area.getOwnedPlot(loc);
+                                    if (current == null || ((current != plot1) && (current != plot2) && (current
+                                            != plot3) && (current != plot4))) {
+                                        newBlockEntities.add(blockEntity);
+                                    }
+                                }
+
+                                chunkData.setBlockEntityInfo(newBlockEntities);
                             } else {
                                 // 1.17-
                                 byteArrays.write(0, baos.toByteArray());
@@ -383,57 +384,4 @@ public class PacketHandler {
         return bits;
     }
 
-    /**
-     * Workaround method to dynamically inject fields into a custom non-implemented structure modifier.
-     *
-     * @param structureModifier the custom structureModifier where to inject the fields
-     * @param type              the structure modifier hold class type
-     */
-    private static void loadInternalFields(StructureModifier<?> structureModifier, Class<?> type) {
-        List<Field> fields = getFields(type);
-
-        try {
-            // New v5 management, "data" field has been removed since c5f05509531eb22e9a0580f07bc0bf17a901b729.
-            List<Object> fieldAccessors = new ArrayList<>(fields.size());
-            for (Field field : fields) {
-                fieldAccessors.add(com.comphenix.protocol.reflect.accessors.Accessors.getFieldAccessor(field));
-            }
-
-            Field accessors = StructureModifier.class.getDeclaredField("accessors");
-            accessors.setAccessible(true);
-            accessors.set(structureModifier, fieldAccessors);
-        } catch (NoSuchFieldException e) {
-            // Former v5 management.
-            try {
-                Field data = StructureModifier.class.getDeclaredField("data");
-                data.setAccessible(true);
-                data.set(structureModifier, fields);
-            } catch (NoSuchFieldException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Fetch all the declared non-static fields of a class.
-     *
-     * @param type the class to fetch the fields from
-     * @return the type fields
-     */
-    private static List<Field> getFields(Class<?> type) {
-        List<Field> result = new ArrayList<>();
-
-        // Retrieve every private and public field
-        for (Field field : FuzzyReflection.fromClass(type, true).getDeclaredFields(null)) {
-            int mod = field.getModifiers();
-
-            // Ignore static fields
-            if (!Modifier.isStatic(mod)) {
-                result.add(field);
-            }
-        }
-        return result;
-    }
 }
