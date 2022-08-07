@@ -363,6 +363,36 @@ public class PacketHandler {
                         }
                     }
                 });
+
+        manager.addPacketListener(new PacketAdapter(main, ListenerPriority.NORMAL,
+                PacketType.Play.Server.SPAWN_ENTITY) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                Player player = event.getPlayer();
+                PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
+                if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
+                    return;
+                }
+
+                World<?> world = plotPlayer.getLocation().getWorld();
+                if (!hasPlotArea(world)) { // Not a plot area
+                    return;
+                }
+
+                PacketContainer packet = event.getPacket();
+                StructureModifier<Double> doubles = packet.getDoubles();
+                double x = doubles.read(0);
+                double y = doubles.read(1);
+                double z = doubles.read(2);
+
+                Location loc = Location.at(world, (int) x, (int) y, (int) z);
+                Plot plot = loc.getOwnedPlot();
+                if (plot != null && (plot.isDenied(plotPlayer.getUUID()) || (!plot.isAdded(plotPlayer.getUUID())
+                        && plot.getFlag(HideFlag.class)))) {
+                    event.setCancelled(true);
+                }
+            }
+        });
     }
 
     private boolean hasPlotArea(World<?> world) {
