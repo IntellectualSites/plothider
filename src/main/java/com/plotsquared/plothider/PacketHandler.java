@@ -380,7 +380,7 @@ public class PacketHandler {
     }
 
     /**
-     * Worldaround method to dynamically inject fields into a custom non-implemented structure modifier.
+     * Workaround method to dynamically inject fields into a custom non-implemented structure modifier.
      *
      * @param structureModifier the custom structureModifier where to inject the fields
      * @param type              the structure modifier hold class type
@@ -389,10 +389,25 @@ public class PacketHandler {
         List<Field> fields = getFields(type);
 
         try {
-            Field data = StructureModifier.class.getDeclaredField("data");
-            data.setAccessible(true);
-            data.set(structureModifier, fields);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // New v5 management, "data" field has been removed since c5f05509531eb22e9a0580f07bc0bf17a901b729.
+            List<Object> fieldAccessors = new ArrayList<>(fields.size());
+            for (Field field : fields) {
+                fieldAccessors.add(com.comphenix.protocol.reflect.accessors.Accessors.getFieldAccessor(field));
+            }
+
+            Field accessors = StructureModifier.class.getDeclaredField("accessors");
+            accessors.setAccessible(true);
+            accessors.set(structureModifier, fieldAccessors);
+        } catch (NoSuchFieldException e) {
+            // Former v5 management.
+            try {
+                Field data = StructureModifier.class.getDeclaredField("data");
+                data.setAccessible(true);
+                data.set(structureModifier, fields);
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
