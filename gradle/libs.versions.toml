@@ -3,7 +3,7 @@
 paper = "1.19-R0.1-SNAPSHOT"
 
 # Plugins
-worldedit = "7.2.11"
+worldedit = "7.2.12"
 protocollib = "4.8.0"
 
 # Third party
