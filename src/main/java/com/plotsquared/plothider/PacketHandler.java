@@ -39,7 +39,6 @@ import com.plotsquared.core.location.World;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
-import com.plotsquared.core.util.Permissions;
 import com.plotsquared.plothider.storage.BlockStorage;
 import com.plotsquared.plothider.storage.palette.PalettedContainer;
 import com.plotsquared.plothider.storage.palette.PalettedContainerType;
@@ -61,11 +60,11 @@ public class PacketHandler {
                 new PacketAdapter(main, ListenerPriority.NORMAL, PacketType.Play.Server.BLOCK_CHANGE) {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
-                        PlotPlayer<?> pp = BukkitUtil.adapt(player);
-                        if (Permissions.hasPermission(pp, "plots.plothider.bypass")) { // Admin bypass
+                        PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
+                        if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
                             return;
                         }
-                        World<?> world = pp.getLocation().getWorld();
+                        World<?> world = plotPlayer.getLocation().getWorld();
                         if (!hasPlotArea(world)) { // Not a plot area
                             return;
                         }
@@ -74,7 +73,7 @@ public class PacketHandler {
                         BlockPosition position = positions.read(0);
                         Location loc = Location.at(world, position.getX(), 0, position.getZ());
                         Plot plot = loc.getOwnedPlot();
-                        if (plot != null && (plot.isDenied(pp.getUUID()) || (!plot.isAdded(pp.getUUID())
+                        if (plot != null && (plot.isDenied(plotPlayer.getUUID()) || (!plot.isAdded(plotPlayer.getUUID())
                                 && plot.getFlag(HideFlag.class)))) {
                             event.setCancelled(true);
                         }
@@ -87,7 +86,7 @@ public class PacketHandler {
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
                 PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-                if (Permissions.hasPermission(plotPlayer, "plots.plothider.bypass")) { // Admin bypass
+                if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
                     return;
                 }
                 World<?> world = plotPlayer.getLocation().getWorld();
@@ -176,7 +175,7 @@ public class PacketHandler {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
                         PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-                        if (Permissions.hasPermission(plotPlayer, "plots.plothider.bypass")) { // Admin bypass
+                        if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
                             return;
                         }
 
