@@ -53,6 +53,7 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         new PacketHandler(this);
         Bukkit.getPluginManager().registerEvents(this, this);
+        new PlotSquaredListener();
         GlobalFlagContainer.getInstance().addFlag(HideFlag.HIDE_FLAG_FALSE);
         try {
             loadCaptions();
