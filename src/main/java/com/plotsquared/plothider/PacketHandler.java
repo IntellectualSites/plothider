@@ -61,20 +61,17 @@ public class PacketHandler {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
                         PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-                        if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
-                            return;
-                        }
                         World<?> world = plotPlayer.getLocation().getWorld();
-                        if (!hasPlotArea(world)) { // Not a plot area
+                        if (!canHide(plotPlayer, world)) {
                             return;
                         }
+
                         PacketContainer packet = event.getPacket();
                         StructureModifier<BlockPosition> positions = packet.getBlockPositionModifier();
                         BlockPosition position = positions.read(0);
                         Location loc = Location.at(world, position.getX(), 0, position.getZ());
                         Plot plot = loc.getOwnedPlot();
-                        if (plot != null && (plot.isDenied(plotPlayer.getUUID()) || (!plot.isAdded(plotPlayer.getUUID())
-                                && plot.getFlag(HideFlag.class)))) {
+                        if (shouldHide(plot, plotPlayer)) {
                             event.setCancelled(true);
                         }
                     }
@@ -86,13 +83,11 @@ public class PacketHandler {
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
                 PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-                if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
-                    return;
-                }
                 World<?> world = plotPlayer.getLocation().getWorld();
-                if (!hasPlotArea(world)) { // Not a plot area
+                if (!canHide(plotPlayer, world)) {
                     return;
                 }
+
                 PacketContainer packet = event.getPacket();
                 StructureModifier<BlockPosition> sectionPositions = packet.getSectionPositions();
                 BlockPosition sectionPosition = sectionPositions.read(0);
@@ -109,20 +104,11 @@ public class PacketHandler {
                 Plot plot2 = corner2.getOwnedPlot();
                 Plot plot3 = corner3.getOwnedPlot();
                 Plot plot4 = corner4.getOwnedPlot();
-                plot1 =
-                        (plot1 != null && (plot1.isDenied(plotPlayer.getUUID()) || (!plot1.isAdded(plotPlayer.getUUID())
-                                && plot1.getFlag(HideFlag.class)))) ? plot1 : null;
-                plot2 =
-                        (plot2 != null && (plot2.isDenied(plotPlayer.getUUID()) || (!plot2.isAdded(plotPlayer.getUUID())
-                                && plot2.getFlag(HideFlag.class)))) ? plot2 : null;
-                plot3 =
-                        (plot3 != null && (plot3.isDenied(plotPlayer.getUUID()) || (!plot3.isAdded(plotPlayer.getUUID())
-                                && plot3.getFlag(HideFlag.class)))) ? plot3 : null;
-                plot4 =
-                        (plot4 != null && (plot4.isDenied(plotPlayer.getUUID()) || (!plot4.isAdded(plotPlayer.getUUID())
-                                && plot4.getFlag(HideFlag.class)))) ? plot4 : null;
-                if (plot1 == null && plot2 == null && plot3 == null
-                        && plot4 == null) { // No plots to hide
+                plot1 = shouldHide(plot1, plotPlayer) ? plot1 : null;
+                plot2 = shouldHide(plot2, plotPlayer) ? plot2 : null;
+                plot3 = shouldHide(plot3, plotPlayer) ? plot3 : null;
+                plot4 = shouldHide(plot4, plotPlayer) ? plot4 : null;
+                if (plot1 == null && plot2 == null && plot3 == null && plot4 == null) { // No plots to hide
                     return;
                 }
                 if (plot1 == plot4 && plot1 != null) { // Not allowed to see the entire chunk
@@ -141,8 +127,7 @@ public class PacketHandler {
                 // Both lists have same length.
                 Iterator<Short> positionsIter = positions.iterator();
                 Iterator<WrappedBlockData> blocksIter = blocks.iterator();
-                Plot denied =
-                        plot1 != null ? plot1 : plot2 != null ? plot2 : plot3 != null ? plot3 : plot4;
+                Plot denied = plot1 != null ? plot1 : plot2 != null ? plot2 : plot3 != null ? plot3 : plot4;
                 PlotArea area = denied.getArea();
                 while (positionsIter.hasNext()) {
                     short change = positionsIter.next();
@@ -175,12 +160,8 @@ public class PacketHandler {
                     public void onPacketSending(PacketEvent event) {
                         Player player = event.getPlayer();
                         PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-                        if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
-                            return;
-                        }
-
                         World<?> world = plotPlayer.getLocation().getWorld();
-                        if (!hasPlotArea(world)) { // Not a plot area
+                        if (!canHide(plotPlayer, world)) {
                             return;
                         }
 
@@ -219,22 +200,10 @@ public class PacketHandler {
                         Plot plot3 = corner3.getOwnedPlot();
                         Plot plot4 = corner4.getOwnedPlot();
 
-                        plot1 = (plot1 != null && (plot1.isDenied(plotPlayer.getUUID()) || (
-                                !plot1.isAdded(plotPlayer.getUUID()) && plot1.getFlag(HideFlag.class)))) ?
-                                plot1 :
-                                null;
-                        plot2 = (plot2 != null && (plot2.isDenied(plotPlayer.getUUID()) || (
-                                !plot2.isAdded(plotPlayer.getUUID()) && plot2.getFlag(HideFlag.class)))) ?
-                                plot2 :
-                                null;
-                        plot3 = (plot3 != null && (plot3.isDenied(plotPlayer.getUUID()) || (
-                                !plot3.isAdded(plotPlayer.getUUID()) && plot3.getFlag(HideFlag.class)))) ?
-                                plot3 :
-                                null;
-                        plot4 = (plot4 != null && (plot4.isDenied(plotPlayer.getUUID()) || (
-                                !plot4.isAdded(plotPlayer.getUUID()) && plot4.getFlag(HideFlag.class)))) ?
-                                plot4 :
-                                null;
+                        plot1 = shouldHide(plot1, plotPlayer) ? plot1 : null;
+                        plot2 = shouldHide(plot2, plotPlayer) ? plot2 : null;
+                        plot3 = shouldHide(plot3, plotPlayer) ? plot3 : null;
+                        plot4 = shouldHide(plot4, plotPlayer) ? plot4 : null;
 
                         if (plot1 == null && plot2 == null && plot3 == null
                                 && plot4 == null) { // No plots to hide
@@ -330,8 +299,8 @@ public class PacketHandler {
                                     Location loc = Location.at(world, bx + x, 0, bz + z);
                                     Plot current = area.getOwnedPlot(loc);
                                     if (current != null) {
-                                        if ((current == plot1) || (current == plot2) || (current
-                                                == plot3) || (current == plot4)) {
+                                        if ((current == plot1) || (current == plot2) || (current == plot3)
+                                                || (current == plot4)) {
                                             for (BlockStorage section1 : array) {
                                                 for (int y = 0; y < 16; y++) {
                                                     if (section1.getBlock(x, y, z) != PalettedContainer.AIR) {
@@ -370,12 +339,8 @@ public class PacketHandler {
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
                 PlotPlayer<?> plotPlayer = BukkitUtil.adapt(player);
-                if (plotPlayer.hasPermission("plots.plothider.bypass")) { // Admin bypass
-                    return;
-                }
-
                 World<?> world = plotPlayer.getLocation().getWorld();
-                if (!hasPlotArea(world)) { // Not a plot area
+                if (!canHide(plotPlayer, world)) {
                     return;
                 }
 
@@ -387,16 +352,25 @@ public class PacketHandler {
 
                 Location loc = Location.at(world, (int) x, (int) y, (int) z);
                 Plot plot = loc.getOwnedPlot();
-                if (plot != null && (plot.isDenied(plotPlayer.getUUID()) || (!plot.isAdded(plotPlayer.getUUID())
-                        && plot.getFlag(HideFlag.class)))) {
+                if (shouldHide(plot, plotPlayer)) {
                     event.setCancelled(true);
                 }
             }
         });
     }
 
+    private boolean canHide(PlotPlayer<?> plotPlayer, World<?> world) {
+        // Check admin bypass and existing plot area.
+        return !plotPlayer.hasPermission("plots.plothider.bypass") && hasPlotArea(world);
+    }
+
     private boolean hasPlotArea(World<?> world) {
         return PlotSquared.get().getPlotAreaManager().hasPlotArea(world.getName());
+    }
+
+    private boolean shouldHide(Plot plot, PlotPlayer<?> plotPlayer) {
+        return plot != null && (plot.isDenied(plotPlayer.getUUID()) || (!plot.isAdded(plotPlayer.getUUID())
+                && plot.getFlag(HideFlag.class)));
     }
 
     private static BitSet intToBitSet(int n) {
