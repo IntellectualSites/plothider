@@ -65,12 +65,18 @@ public class PlotSquaredListener implements Listener {
 
     @Subscribe
     public void onPlotFlagAddEvent(PlotFlagAddEvent event) {
-        refreshPlot(event.getPlot());
+        Plot plot = event.getPlot();
+        if (event.getFlag() instanceof HideFlag) {
+            refreshPlot(plot);
+        }
     }
 
     @Subscribe
     public void onPlotFlagRemoveEvent(PlotFlagRemoveEvent event) {
-        refreshPlot(event.getPlot());
+        Plot plot = event.getPlot();
+        if (event.getFlag() instanceof HideFlag) {
+            refreshPlot(plot);
+        }
     }
 
     private void refreshPlot(Plot plot) {
@@ -84,6 +90,7 @@ public class PlotSquaredListener implements Listener {
 
             for (int x = fromChunk.getX(); x <= toChunk.getX(); x++) {
                 for (int z = fromChunk.getZ(); z <= toChunk.getZ(); z++) {
+                    // Triggers a MapChunk packet, later handled by PlotHider's packet listener.
                     world.refreshChunk(x, z);
                 }
             }
