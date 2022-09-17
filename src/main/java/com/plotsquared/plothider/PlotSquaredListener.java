@@ -23,6 +23,8 @@ import com.plotsquared.core.PlotAPI;
 import com.plotsquared.core.events.*;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.util.task.TaskManager;
+import com.plotsquared.core.util.task.TaskTime;
 import com.sk89q.worldedit.math.BlockVector2;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
@@ -67,7 +69,8 @@ public class PlotSquaredListener implements Listener {
     public void onPlotFlagAddEvent(PlotFlagAddEvent event) {
         Plot plot = event.getPlot();
         if (event.getFlag() instanceof HideFlag) {
-            refreshPlot(plot);
+            // Waits a bit because the flag is added after the event call.
+            TaskManager.runTaskLater(() -> refreshPlot(plot), TaskTime.ticks(1));
         }
     }
 
@@ -75,7 +78,8 @@ public class PlotSquaredListener implements Listener {
     public void onPlotFlagRemoveEvent(PlotFlagRemoveEvent event) {
         Plot plot = event.getPlot();
         if (event.getFlag() instanceof HideFlag) {
-            refreshPlot(plot);
+            // Waits a bit because the flag is removed after the event call.
+            TaskManager.runTaskLater(() -> refreshPlot(plot), TaskTime.ticks(1));
         }
     }
 
