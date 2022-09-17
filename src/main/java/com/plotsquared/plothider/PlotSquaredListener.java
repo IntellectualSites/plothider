@@ -84,19 +84,39 @@ public class PlotSquaredListener implements Listener {
     }
 
     private void refreshPlot(Plot plot) {
+        int regionBottomCornerX = plot.getBottomAbs().getX();
+        int regionBottomCornerZ = plot.getBottomAbs().getZ();
+        int regionTopCornerX = plot.getTopAbs().getX();
+        int regionTopCornerZ = plot.getTopAbs().getZ();
+
         for (Plot connectedPlot : plot.getConnectedPlots()) {
             Location bottomCorner = connectedPlot.getBottomAbs();
             Location topCorner = connectedPlot.getTopAbs();
-            World world = (World) bottomCorner.getWorld().getPlatformWorld();
 
-            BlockVector2 fromChunk = bottomCorner.getChunkLocation();
-            BlockVector2 toChunk = topCorner.getChunkLocation();
+            if (bottomCorner.getX() < regionBottomCornerX) {
+                regionBottomCornerX = bottomCorner.getX();
+            }
+            if (bottomCorner.getZ() < regionBottomCornerZ) {
+                regionBottomCornerZ = bottomCorner.getZ();
+            }
+            if (topCorner.getX() > regionTopCornerX) {
+                regionTopCornerX = topCorner.getX();
+            }
+            if (topCorner.getZ() > regionTopCornerZ) {
+                regionTopCornerZ = topCorner.getZ();
+            }
+        }
 
-            for (int x = fromChunk.getX(); x <= toChunk.getX(); x++) {
-                for (int z = fromChunk.getZ(); z <= toChunk.getZ(); z++) {
-                    // Triggers a MapChunk packet, later handled by PlotHider's packet listener.
-                    world.refreshChunk(x, z);
-                }
+        World world = (World) plot.getBottomAbs().getWorld().getPlatformWorld();
+        int fromChunkX = regionBottomCornerX >> 4;
+        int fromChunkZ = regionBottomCornerZ >> 4;
+        int toChunkX = regionTopCornerX >> 4;
+        int toChunkZ = regionTopCornerZ >> 4;
+
+        for (int x = fromChunkX; x <= toChunkX; x++) {
+            for (int z = fromChunkZ; z <= toChunkZ; z++) {
+                // Triggers a MapChunk packet, later handled by PlotHider's packet listener.
+                world.refreshChunk(x, z);
             }
         }
     }
