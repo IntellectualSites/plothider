@@ -1,7 +1,4 @@
 [versions]
-# Platform expectations
-paper = "1.19-R0.1-SNAPSHOT"
-
 # Plugins
 worldedit = "7.2.12"
 protocollib = "5.0.0-SNAPSHOT"
@@ -11,7 +8,7 @@ bstats = "3.0.0"
 
 # Gradle plugins
 shadow = "7.1.2"
-licenser = "0.6.1"
+spotless = "6.12.1"
 bukkityml = "0.5.2"
 
 [libraries]
@@ -21,5 +18,5 @@ protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
-licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "bukkityml" }

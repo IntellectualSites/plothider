@@ -1,6 +1,6 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.cadixdev.gradle.licenser.LicenseExtension
+import com.diffplug.gradle.spotless.SpotlessPlugin
 
 plugins {
     java
@@ -8,7 +8,7 @@ plugins {
 
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginyml)
-    alias(libs.plugins.licenser)
+    id("com.diffplug.spotless") version "6.12.1"
 }
 
 java {
@@ -43,10 +43,11 @@ dependencies {
     implementation("org.bstats:bstats-base")
 }
 
-configure<LicenseExtension> {
-    header.set(resources.text.fromFile(file("HEADER.txt")))
-    include("**/*.java")
-    newLine.set(false)
+spotless {
+    java {
+        licenseHeaderFile(rootProject.file("HEADER.txt"))
+        target("**/*.java")
+    }
 }
 
 bukkit {
