@@ -27,7 +27,6 @@ import com.plotsquared.core.configuration.caption.load.DefaultCaptionProvider;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.flag.GlobalFlagContainer;
-import com.plotsquared.core.util.Permissions;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
