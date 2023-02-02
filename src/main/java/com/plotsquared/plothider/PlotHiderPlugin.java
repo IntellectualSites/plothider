@@ -47,15 +47,15 @@ import java.util.regex.Pattern;
 public class PlotHiderPlugin extends JavaPlugin implements Listener {
 
     public static final String PLOT_HIDER_NAMESPACE = "plothider";
-    private static final String REQUIRED_PLIB_VERSION = "5.0.0-SNAPSHOT";
     private static final int BSTATS_ID = 6412;
 
     @Override
     public void onEnable() {
         // Check based on #startsWith because plugin version contains the build number.
-        if (!ProtocolLibrary.getPlugin().getDescription().getVersion().startsWith(REQUIRED_PLIB_VERSION)) {
-            getLogger().log(Level.SEVERE, "ProtocolLib " + REQUIRED_PLIB_VERSION + " is required to run " +
-                    "PlotHider, please install the latest update!");
+        if (!ProtocolLibrary.getPlugin().getDescription().getVersion().startsWith("5")) {
+            getLogger().log(Level.SEVERE, "ProtocolLib 5 is required to run " +
+                    "PlotHider, please install the latest update:");
+            getLogger().log(Level.INFO, "https://www.spigotmc.org/resources/protocollib.1997/");
             getPluginLoader().disablePlugin(this);
             return;
         }
