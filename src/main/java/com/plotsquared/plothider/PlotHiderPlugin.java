@@ -18,6 +18,7 @@
  */
 package com.plotsquared.plothider;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.configuration.Settings;
@@ -50,6 +51,15 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        // Check based on #startsWith because plugin version contains the build number.
+        if (!ProtocolLibrary.getPlugin().getDescription().getVersion().startsWith("5")) {
+            getLogger().log(Level.SEVERE, "ProtocolLib 5 is required to run " +
+                    "PlotHider, please install the latest update:");
+            getLogger().log(Level.INFO, "https://www.spigotmc.org/resources/protocollib.1997/");
+            getPluginLoader().disablePlugin(this);
+            return;
+        }
+
         new PacketHandler(this);
         Bukkit.getPluginManager().registerEvents(this, this);
         new PlotSquaredListener();
