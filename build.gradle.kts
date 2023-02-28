@@ -8,7 +8,7 @@ plugins {
 
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginyml)
-    id("com.diffplug.spotless") version "6.15.0"
+    id("com.diffplug.spotless") version "6.16.0"
 }
 
 java {
