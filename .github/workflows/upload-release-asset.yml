@@ -9,7 +9,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@55e685c48d84285a5b0418cd094606e199cca3b6 # v1
+        uses: gradle/wrapper-validation-action@v1
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -19,7 +19,7 @@ jobs:
       - name: Clean Build
         run: ./gradlew clean build
       - name: Upload Release Assets
-        uses: AButler/upload-release-assets@b2b56d8ca22109e8606ac54603ab60dfb32058a7 # ratchet:AButler/upload-release-assets@v2.0
+        uses: AButler/upload-release-assets@v2.0
         with:
           files: 'build/libs/plothider-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
