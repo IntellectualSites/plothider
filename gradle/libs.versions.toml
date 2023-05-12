@@ -1,7 +1,7 @@
 [versions]
 # Plugins
 worldedit = "7.2.14"
-protocollib = "5.0.0-SNAPSHOT"
+protocollib = "5.0.0"
 
 # Third party
 bstats = "3.0.0"
