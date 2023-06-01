@@ -8,7 +8,7 @@ bstats = "3.0.0"
 
 # Gradle plugins
 shadow = "8.1.1"
-spotless = "6.18.0"
+spotless = "6.19.0"
 bukkityml = "0.5.3"
 
 [libraries]
