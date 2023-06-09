@@ -30,13 +30,16 @@ repositories {
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
+    // TODO remove once this is part of BOM
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    implementation(platform("com.intellectualsites.bom:bom-1.18.x:1.27"))
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.29"))
     compileOnly("io.papermc.paper:paper-api")
-    compileOnly("com.plotsquared:PlotSquared-Core")
-    compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
+    // TODO remove version once this is part of BOM
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.0.0-SNAPSHOT")
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit:7.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly(libs.protocollib)
     compileOnly(libs.worldedit)
     implementation("org.bstats:bstats-bukkit")
