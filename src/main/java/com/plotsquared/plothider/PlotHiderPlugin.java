@@ -56,7 +56,7 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
             getLogger().log(Level.SEVERE, "ProtocolLib 5 is required to run " +
                     "PlotHider, please install the latest update:");
             getLogger().log(Level.INFO, "https://www.spigotmc.org/resources/protocollib.1997/");
-            getPluginLoader().disablePlugin(this);
+            Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 

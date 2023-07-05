@@ -33,10 +33,10 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("com.intellectualsites.bom:bom-1.18.x:1.31"))
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.32"))
     compileOnly("io.papermc.paper:paper-api")
-    compileOnly("com.plotsquared:PlotSquared-Core")
-    compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
     compileOnly(libs.protocollib)
     compileOnly(libs.worldedit)
     implementation("org.bstats:bstats-bukkit")
