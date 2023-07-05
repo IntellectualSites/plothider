@@ -1,6 +1,6 @@
 [versions]
 # Plugins
-worldedit = "7.2.14"
+worldedit = "7.2.15"
 protocollib = "5.0.0"
 
 # Third party
@@ -9,7 +9,7 @@ bstats = "3.0.0"
 # Gradle plugins
 shadow = "8.1.1"
 spotless = "6.19.0"
-bukkityml = "0.5.3"
+bukkityml = "0.6.0"
 
 [libraries]
 # Plugins
