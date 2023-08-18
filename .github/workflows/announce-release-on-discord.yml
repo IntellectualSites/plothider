@@ -19,5 +19,7 @@ jobs:
             ""
             "Click here to view changelog: https://github.com/IntellectualSites/plothider/releases/tag/${{ github.event.release.tag_name }}"
             ""
-            "The download is available at:"
+            "The primary download is available at Modrinth: <https://modrinth.com/plugin/holoplots/version/${{ github.event.release.tag_name }}>"
+            ""
+            "An alternative download is available at:"
             "- Spigot: <https://www.spigotmc.org/resources/20701/>"

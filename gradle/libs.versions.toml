@@ -10,6 +10,7 @@ bstats = "3.0.0"
 shadow = "8.1.1"
 spotless = "6.20.0"
 bukkityml = "0.6.0"
+minotaur = "2.8.3"
 
 [libraries]
 # Plugins
@@ -20,3 +21,4 @@ protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "bukkityml" }
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
