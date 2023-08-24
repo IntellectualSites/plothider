@@ -24,3 +24,7 @@ jobs:
           files: 'build/libs/plothider-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.event.release.tag_name }}
+      - name: Upload to Modrinth
+        run: ./gradlew clean build modrinth publishAllPublicationsToHangar
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
