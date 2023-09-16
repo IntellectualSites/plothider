@@ -49,6 +49,7 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
     public static final String PLOT_HIDER_NAMESPACE = "plothider";
     private static final int BSTATS_ID = 6412;
 
+    @SuppressWarnings("deprecation") // Paper deprecation
     @Override
     public void onEnable() {
         // Check based on #startsWith because plugin version contains the build number.
