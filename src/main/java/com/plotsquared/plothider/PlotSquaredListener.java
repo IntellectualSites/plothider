@@ -25,7 +25,6 @@ import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.util.task.TaskManager;
 import com.plotsquared.core.util.task.TaskTime;
-import com.sk89q.worldedit.math.BlockVector2;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
 
