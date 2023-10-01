@@ -1,6 +1,6 @@
 [versions]
 # Plugins
-worldedit = "7.2.15"
+worldedit = "7.2.16"
 protocollib = "5.1.0"
 
 # Third party
