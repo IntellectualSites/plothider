@@ -16,8 +16,15 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
 
-tasks.compileJava.configure {
-    options.release.set(17)
+tasks {
+    compileJava.configure {
+        options.release.set(17)
+    }
+
+    withType<AbstractArchiveTask>().configureEach {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
 }
 
 configurations.all {
