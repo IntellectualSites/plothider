@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("com.intellectualsites.bom:bom-newest:1.46"))
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.47"))
     compileOnly("io.papermc.paper:paper-api")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
