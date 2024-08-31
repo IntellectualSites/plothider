@@ -7,7 +7,7 @@ protocollib = "5.1.0"
 bstats = "3.0.0"
 
 # Gradle plugins
-shadow = "8.1.1"
+shadow = "8.3.0"
 spotless = "6.25.0"
 bukkityml = "0.6.0"
 minotaur = "2.8.7"
@@ -18,7 +18,7 @@ worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.
 protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "bukkityml" }
 minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
