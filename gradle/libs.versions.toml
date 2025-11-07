@@ -1,7 +1,7 @@
 [versions]
 # Plugins
 worldedit = "7.3.0"
-protocollib = "5.3.0"
+protocollib = "5.4.0"
 
 # Third party
 bstats = "3.0.0"
@@ -15,7 +15,7 @@ minotaur = "2.8.8"
 [libraries]
 # Plugins
 worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.ref = "worldedit" }
-protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
+protocollib = { group = "net.dmulloy2", name = "ProtocolLib", version.ref = "protocollib" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
