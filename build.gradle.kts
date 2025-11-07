@@ -13,12 +13,12 @@ plugins {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
     compileJava.configure {
-        options.release.set(17)
+        options.release.set(21)
     }
 
     withType<AbstractArchiveTask>().configureEach {
@@ -28,7 +28,7 @@ tasks {
 }
 
 configurations.all {
-    attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
+    attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
 }
 
 version = "6.0.2-SNAPSHOT"
@@ -40,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("com.intellectualsites.bom:bom-newest:1.47"))
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.55"))
     compileOnly("io.papermc.paper:paper-api")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
