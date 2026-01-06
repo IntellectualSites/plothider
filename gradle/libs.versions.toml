@@ -7,7 +7,7 @@ protocollib = "5.4.0"
 bstats = "3.0.0"
 
 # Gradle plugins
-shadow = "9.3.0"
+shadow = "9.3.1"
 spotless = "8.1.0"
 bukkityml = "0.6.0"
 minotaur = "2.8.10"
