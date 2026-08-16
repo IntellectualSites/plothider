@@ -79,11 +79,10 @@ bukkit {
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set(null as String?)
+    relocate("org.bstats", "com.plotsquared.plothider.metrics")
     dependencies {
-        relocate("org.bstats", "com.plotsquared.plothider.metrics") {
-            include(dependency("org.bstats:bstats-base"))
-            include(dependency("org.bstats:bstats-bukkit"))
-        }
+        include(dependency("org.bstats:bstats-base"))
+        include(dependency("org.bstats:bstats-bukkit"))
     }
     minimize()
 }
