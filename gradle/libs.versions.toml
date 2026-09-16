@@ -10,7 +10,7 @@ bstats = "3.0.0"
 shadow = "9.6.1"
 spotless = "8.10.0"
 bukkityml = "0.6.0"
-minotaur = "2.9.0"
+minotaur = "2.10.0"
 
 [libraries]
 # Plugins
